@@ -1,0 +1,19 @@
+/* Shared primitives. Attribute scope also works inside CSS-module application cards. */
+:where(.mm-panel,[data-machine-detail-card]) {
+ --mg-line:color-mix(in srgb,currentColor 12%,transparent);
+ --mg-hover:color-mix(in srgb,currentColor 4%,transparent);
+ --mg-muted:var(--dsw-alias-label-secondary,#858991);
+ --mg-focus:#568eab;--mg-success:#48a780;--mg-danger:#dc6060;
+ --mg-radius:7px;--mg-control:32px;--mg-body:13px;--mg-caption:12px;
+}
+:is(.mm-panel,[data-machine-detail-card]) button[data-mgmt-icon-button] {
+ display:inline-flex;align-items:center;justify-content:center;flex:none;
+ width:var(--mg-control);height:var(--mg-control);min-height:var(--mg-control);
+ padding:7px;gap:0;border:0;border-radius:var(--mg-radius);background:transparent;color:inherit;cursor:pointer;
+}
+:is(.mm-panel,[data-machine-detail-card]) button[data-mgmt-icon-button]:hover:not(:disabled){background:var(--mg-hover)}
+:is(.mm-panel,[data-machine-detail-card]) button[data-mgmt-icon-button]:disabled{opacity:.45;cursor:default}
+:is(.mm-panel,[data-machine-detail-card]) button[data-mgmt-icon-button]:focus-visible{outline:2px solid var(--mg-focus);outline-offset:3px}
+:is(.mm-panel,[data-machine-detail-card]) button[data-mgmt-icon-button][aria-busy=true] svg{animation:mg-spin 1s linear infinite}
+@keyframes mg-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){:is(.mm-panel,[data-machine-detail-card]) button[data-mgmt-icon-button][aria-busy=true] svg{animation:none}}

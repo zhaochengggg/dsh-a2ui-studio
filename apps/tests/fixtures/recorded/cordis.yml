@@ -1,0 +1,30 @@
+- id: session-persistence-jsonl
+  config:
+    root: !!js process.env.DSH_SNAPSHOT_SESSIONS_ROOT
+    compression: none
+- id: agent-instructions
+  disabled: true
+- id: system-prompt
+  config:
+    personaPrefix: Follow the user's application-card procedure exactly. Report only observed results.
+    personaSuffix: Your working directory is {{cwd}}.
+- id: acp
+  config:
+    provider: deepseek-official
+    model: deepseek-v4-flash
+- insert:
+    - id: machine-mgmt
+      name: 'dsh-machine-apps/machines'
+      config:
+        catalogPath: !!js process.cwd() + '/.dsh/inventory'
+        journalPath: !!js process.cwd() + '/.dsh/inventory.sqlite3'
+        sshConfigPath: !!js process.cwd() + '/.dsh/ssh/config'
+        sshKnownHostsPath: !!js process.cwd() + '/.dsh/ssh/known_hosts'
+    - id: app-cards
+      name: '@deepseek-ai/dsh-app-cards'
+      config:
+        dataPath: !!js process.cwd() + '/.dsh/applications'
+        hostRoots: []
+        executionTimeoutMs: 5000
+        outputLimitBytes: 4096
+        graceMs: 100

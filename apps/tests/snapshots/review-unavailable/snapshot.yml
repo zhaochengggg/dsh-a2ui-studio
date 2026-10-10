@@ -1,0 +1,11 @@
+version: 1
+scenario: review-unavailable
+profile: acp
+composition: app-cards
+recording: live
+platform: posix
+header:
+  class: app-cards
+  pin: true
+workspace:
+  setup: test-inventory

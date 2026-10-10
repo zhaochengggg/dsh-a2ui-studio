@@ -1,0 +1,4 @@
+- insert:
+    - id: machine-apps
+      name: dsh-machine-apps
+      config: {}

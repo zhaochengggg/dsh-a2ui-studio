@@ -1,0 +1,8 @@
+{
+  "apiVersion": "machine-mgmt.dsh/v1alpha1",
+  "kind": "Machine",
+  "metadata": { "id": "snapshot-host", "displayName": "Snapshot Host" },
+  "strategy": { "kind": "libvirt", "domainName": "unused-snapshot-domain" },
+  "intent": { "summary": "Test-only identity. No remote host or libvirt operation is permitted.", "criticality": "low" },
+  "desired": {}
+}

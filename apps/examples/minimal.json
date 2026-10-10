@@ -1,0 +1,74 @@
+{
+  "apiVersion": "dsh.app-cards/v1",
+  "kind": "MachineAppCards",
+  "machineId": "example-host",
+  "revision": 1,
+  "apps": {
+    "example": { "name": "应用卡片示例", "description": "使用本地 printf 验证声明、授权与检查，不安装或修改服务。" }
+  },
+  "contexts": { "local": { "kind": "host", "cwd": "/tmp" } },
+  "data": { "title": "应用卡片示例" },
+  "operations": {
+    "say": {
+      "kind": "exec",
+      "effect": "observe",
+      "context": "local",
+      "inputSchema": { "type": "object", "properties": {}, "additionalProperties": false },
+      "program": {
+        "kind": "argv", "executable": "printf",
+        "args": [{ "literal": "%s" }, { "literal": "Application operation completed." }]
+      },
+      "output": { "decode": "text", "schema": { "type": "string" } },
+      "successExitCodes": [0],
+      "timeoutMs": 5000,
+      "outputLimitBytes": 4096
+    }
+  },
+  "actions": {
+    "say": {
+      "appId": "example",
+      "label": "输出示例消息",
+      "operation": "say",
+      "input": { "literal": {} },
+      "availability": { "kind": "always" },
+      "invalidates": []
+    }
+  },
+  "checks": {
+    "available": {
+      "appId": "example",
+      "label": "示例命令检查",
+      "operation": "say",
+      "input": { "literal": {} },
+      "evaluate": {
+        "language": "jsonata",
+        "source": "{\"health\":\"healthy\",\"summary\":\"示例命令可用；这不是实际服务健康检查\"}"
+      },
+      "freshForMs": 300000
+    }
+  },
+  "ui": {
+    "a2uiVersion": "0.9.1",
+    "catalogId": "urn:dsh:app-cards:catalog:1",
+    "surfaces": [
+      {
+        "id": "example",
+        "appId": "example",
+        "order": 10,
+        "formInitial": {},
+        "components": [
+          { "id": "root", "component": "Column", "children": ["title", "status", "action"] },
+          { "id": "title", "component": "Text", "text": { "path": "/data/title" } },
+          { "id": "status", "component": "Status", "checkId": "available" },
+          {
+            "id": "action",
+            "component": "Button",
+            "child": "action-label",
+            "action": { "event": { "name": "app.invoke", "context": { "actionId": "say", "input": { "path": "/form" } } } }
+          },
+          { "id": "action-label", "component": "Text", "text": "输出示例消息" }
+        ]
+      }
+    ]
+  }
+}

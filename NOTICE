@@ -1,0 +1,3 @@
+This distribution includes code derived from DeepSeek Harness, copyright (c) 2026 DeepSeek, under the MIT license (see LICENSE).
+vendor/deque.mjs is the unmodified @deepseek-ai/dsh-deque 0.1.5-rc.1 build from the existing installation. It is included because its historical Cordis peer range excludes the supported alpha host despite the deque having no runtime dependencies. Do not replace this utility with another Cordis runtime.
+Application and machine modules include local modifications. This is not an official DeepSeek distribution.
