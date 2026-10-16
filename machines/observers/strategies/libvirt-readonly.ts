@@ -1,7 +1,7 @@
 /**
  * Shared validation and hashing for fixed read-only libvirt probes.
  *
- * @module dsh-machine-apps/machines/strategies/libvirt-readonly
+ * @module dsh-control-studio/machines/strategies/libvirt-readonly
  */
 
 import { createHash } from 'node:crypto'

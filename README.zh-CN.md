@@ -1,10 +1,10 @@
-# DSH Machine & Apps
+# DSH Control Studio
 
 **把你需要的监控和操作告诉 Agent，留下一个可以反复使用的面板。**
 
 DeepSeek Harness 的机器与应用管理插件：Agent 为实际应用编写定制 UI 卡片，人直接在机器面板里查看状态、调整设置，不必每次重新发指令。
 
-[English](README.md) · [下载 v0.3.0](https://github.com/zhaochengggg/dsh-machine-apps/releases/tag/v0.3.0) · [安装与维护](docs/setup.zh-CN.md) · [GPU 示例](docs/gpu-walkthrough.md)
+[English](README.md) · [下载 v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [安装与维护](docs/setup.zh-CN.md) · [GPU 示例](docs/gpu-walkthrough.md)
 
 ![真实双 V100 卡片：逐卡指标、连续色阶与同步功耗设置](docs/media/gpu-panel.png)
 
@@ -39,15 +39,17 @@ DeepSeek Harness 的机器与应用管理插件：Agent 为实际应用编写定
 先下载并校验：
 
 ```sh
-curl -fL -o dsh-machine-apps-0.3.0.tgz \
-  https://github.com/zhaochengggg/dsh-machine-apps/releases/download/v0.3.0/dsh-machine-apps-0.3.0.tgz
-echo 'c74f5f44cc495c5eccec1d6a6ce516c531bcd429adea94677718e975623b6f1d  dsh-machine-apps-0.3.0.tgz' | sha256sum -c -
+curl -fL -o dsh-control-studio-0.3.1.tgz \
+  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
+curl -fL -o SHA256SUMS \
+  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/SHA256SUMS
+sha256sum -c SHA256SUMS
 ```
 
 确认输出 `OK` 后，以运行 DSH 的用户安装：
 
 ```sh
-dsh plugin --profile web add ./dsh-machine-apps-0.3.0.tgz --allow-build=esbuild
+dsh plugin --profile web add ./dsh-control-studio-0.3.1.tgz --allow-build=esbuild
 dsh --profile web --dump-config
 ```
 
@@ -55,8 +57,10 @@ dsh --profile web --dump-config
 
 ## 第一次建议先做只读面板
 
+已经安装 `dsh-machine-apps` 的用户，请先阅读[改名迁移说明](docs/migration.md)，不要同时启用两个包。
+
 登记机器并 @ 到对话，让 Agent 使用 `machine-management` 和 `app-cards-authoring` skills，先检查目标应用，再提出只读卡片。确认数据来源和显示正确后，再添加操作按钮。
 
 本地执行默认未授权；远程操作使用登记的 SSH 身份。打开卡片不会自动应用设置。安装插件也不会修改网络开放、代理、认证或 GPU 服务。目录白名单、数据路径、备份与升级见[安装与维护](docs/setup.zh-CN.md)。
 
-想接入自己的应用？欢迎[提交 issue](https://github.com/zhaochengggg/dsh-machine-apps/issues)，说明 DSH 版本、想要的面板和脱敏后的错误信息。不要上传凭据或私有机器地址。
+想接入自己的应用？欢迎[提交 issue](https://github.com/zhaochengggg/dsh-control-studio/issues)，说明 DSH 版本、想要的面板和脱敏后的错误信息。不要上传凭据或私有机器地址。

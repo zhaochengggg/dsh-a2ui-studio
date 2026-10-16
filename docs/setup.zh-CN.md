@@ -17,7 +17,7 @@ SSH 探测需要 `ssh`、`ssh-keyscan`、`ssh-keygen`。可选 libvirt 观察需
 下载与 SHA256 校验命令见[中文首页](../README.zh-CN.md#安装)，确认校验通过后继续。
 
 ```sh
-dsh plugin --profile web add ./dsh-machine-apps-0.3.0.tgz --allow-build=esbuild
+dsh plugin --profile web add ./dsh-control-studio-0.3.1.tgz --allow-build=esbuild
 dsh --profile web --dump-config
 ```
 
@@ -27,7 +27,7 @@ dsh --profile web --dump-config
 
 ```yaml
 - id: machine-apps
-  name: dsh-machine-apps
+  name: dsh-control-studio
   config:
     appCards:
       hostRoots:
@@ -53,7 +53,7 @@ DSH 对同一行的 config 使用替换语义；已有配置时请保留其他�
 支持 `dataRoot`、`machineRoot`、`sshDir`、`appCards.dataPath` 覆盖路径。升级前停止 DSH 并备份数据，在同一 profile 中安装新版本，重启并刷新页面。卸载只移除插件，不删除数据：
 
 ```sh
-dsh plugin --profile web remove dsh-machine-apps
+dsh plugin --profile web remove dsh-control-studio
 ```
 
 ## 开发与打包

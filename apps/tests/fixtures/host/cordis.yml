@@ -10,7 +10,7 @@
     agents: []
 - name: '@deepseek-ai/dsh-subprocess-local'
 - name: '@deepseek-ai/dsh-user-questions'
-- name: 'dsh-machine-apps/machines'
+- name: 'dsh-control-studio/machines'
   config:
     root: !!js process.env.DSH_APP_CARDS_EXAMPLE_ROOT + '/catalog/machines'
     sshDir: !!js process.env.DSH_APP_CARDS_EXAMPLE_ROOT + '/ssh'

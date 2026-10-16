@@ -6,9 +6,9 @@ export const manageInput=z.object({action:z.enum(['create','update','archive','r
 export const refreshInput=z.object({machine_id:z.string(),path_id:z.string().optional()}).strict();
 const inputs={list:listInput,inspect:inspectInput,manage:manageInput,refresh:refreshInput,networks:z.object({}).strict()};
 const descriptors=Object.entries(inputs).map(([method,schema])=>({
-  id:`dsh-machine-apps#machineMgmt/${method}`,service:'machineMgmt',namespace:'machineMgmt',method,invocation:{kind:'direct'},
+  id:`dsh-control-studio#machineMgmt/${method}`,service:'machineMgmt',namespace:'machineMgmt',method,invocation:{kind:'direct'},
   parameters:[{name:'args',wire:'args',source:'json',codec:{mode:'strict',typeSymbol:`machine/${method}Input`,create:()=>schema}}],
   result:{mode:'strict',typeSymbol:'machine/result',create:()=>z.json()},sourceLocation:{file:'index.mjs',line:1,column:1}
 }));
-export const TYPERT={package:'dsh-machine-apps',face:'host',schemas:[],invocations:descriptors,model:{services:[{key:'machineMgmt',exportName:'MachineManagement',description:'Text machine archives shared by tools and UI.',summary:'Machine archives',tags:[],jsDoc:'/** Text machine archives. */',members:Object.keys(inputs).map(name=>({kind:'method',name,signature:`${name}(args: object): Promise<object>`,summary:`${name} machine archives`,jsDoc:`/** ${name} machine archives. */`})),types:[]}],events:[],objects:[]}};
-export default {package:'dsh-machine-apps',descriptors};
+export const TYPERT={package:'dsh-control-studio',face:'host',schemas:[],invocations:descriptors,model:{services:[{key:'machineMgmt',exportName:'MachineManagement',description:'Text machine archives shared by tools and UI.',summary:'Machine archives',tags:[],jsDoc:'/** Text machine archives. */',members:Object.keys(inputs).map(name=>({kind:'method',name,signature:`${name}(args: object): Promise<object>`,summary:`${name} machine archives`,jsDoc:`/** ${name} machine archives. */`})),types:[]}],events:[],objects:[]}};
+export default {package:'dsh-control-studio',descriptors};

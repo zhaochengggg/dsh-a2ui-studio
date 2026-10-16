@@ -1,7 +1,7 @@
 /**
  * Bounded host-level observation of libvirt virtual networks.
  *
- * @module dsh-machine-apps/machines/networks/libvirt
+ * @module dsh-control-studio/machines/networks/libvirt
  */
 
 import { isIP } from 'node:net'

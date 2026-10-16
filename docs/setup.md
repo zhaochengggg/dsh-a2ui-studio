@@ -16,7 +16,7 @@ Local command execution is not authorized by default. If needed, add your own di
 
 ```yaml
 - id: machine-apps
-  name: dsh-machine-apps
+  name: dsh-control-studio
   config:
     appCards:
       hostRoots:
@@ -40,7 +40,7 @@ Overrides: `dataRoot`, `machineRoot`, `sshDir`, `appCards.dataPath`.
 Before upgrading, stop DSH and back up these data directories. Install the new package in the same profile, restart, and refresh the browser. Removal keeps data:
 
 ```sh
-dsh plugin --profile web remove dsh-machine-apps
+dsh plugin --profile web remove dsh-control-studio
 ```
 
 ## Development

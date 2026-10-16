@@ -1,6 +1,6 @@
 # 独立组件包开发契约
 
-运行时 API 为 1。插件为 `dsh-machine-apps`，控制器是安装包内 `apps/lib/extensionctl.js`。从本 skill 的实际资源目录向上两级可定位 `apps`，不要猜测服务器上的绝对路径。下文将控制器绝对路径记作 `EXTENSIONCTL`。不改插件源码，不重建插件，不重启 DSH；安装成功后刷新网页。内置 telemetry.v1.Gauge 仍可直接使用。
+运行时 API 为 1。插件为 `dsh-control-studio`，控制器是安装包内 `apps/lib/extensionctl.js`。从本 skill 的实际资源目录向上两级可定位 `apps`，不要猜测服务器上的绝对路径。下文将控制器绝对路径记作 `EXTENSIONCTL`。不改插件源码，不重建插件，不重启 DSH；安装成功后刷新网页。内置 telemetry.v1.Gauge 仍可直接使用。
 
 ## 源码与构建
 

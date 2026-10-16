@@ -1,7 +1,7 @@
 /**
  * Bounded read-only libvirt domain inspection and capability reporting.
  *
- * @module dsh-machine-apps/machines/strategies/libvirt
+ * @module dsh-control-studio/machines/strategies/libvirt
  */
 
 import { XMLParser } from 'fast-xml-parser'

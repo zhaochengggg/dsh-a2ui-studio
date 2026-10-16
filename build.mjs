@@ -19,7 +19,7 @@ await build({...node,entryPoints:['apps/src/maintenance.ts'],outfile:'apps/lib/m
 await build({...node,external:[...node.external,'esbuild'],entryPoints:['apps/src/extensions/cli.ts'],outfile:'apps/lib/extensionctl.js'});
 await build({entryPoints:[require.resolve('jsonata')],bundle:true,platform:'node',format:'cjs',outfile:'apps/lib/jsonata.cjs'});
 await build({...node,entryPoints:['remote.ts'],outfile:'lib/remote.js'});
-await build({...common,entryPoints:['client.ts'],outfile:'lib/client.js',format:'cjs',platform:'browser',plugins:[styles],loader:{'.css':'text'},jsx:'automatic',external:['react','react/jsx-runtime'],banner:{js:'window.__ModuleLoader__.load({id:"dsh-machine-apps",factory:(require)=>{var module={exports:{}};var exports=module.exports;'},footer:{js:'return module.exports;}});'}});
+await build({...common,entryPoints:['client.ts'],outfile:'lib/client.js',format:'cjs',platform:'browser',plugins:[styles],loader:{'.css':'text'},jsx:'automatic',external:['react','react/jsx-runtime'],banner:{js:'window.__ModuleLoader__.load({id:"dsh-control-studio",factory:(require)=>{var module={exports:{}};var exports=module.exports;'},footer:{js:'return module.exports;}});'}});
 const hashes={};
 async function collect(dir){for(const e of (await readdir(dir,{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){const p=dir+'/'+e.name;if(e.isDirectory())await collect(p);else if(/\.(tsx?|css)$/.test(p))hashes[p]=createHash('sha256').update(await readFile(p)).digest('hex');}}
 await collect('apps/src');await collect('shared');

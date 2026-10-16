@@ -54,7 +54,7 @@ async function boot() {
     ['@deepseek-ai/dsh-system-prompt', SystemPrompt], ['@deepseek-ai/dsh-tools', ToolRuntime],
     ['@deepseek-ai/dsh-skill', SkillRegistry], ['@deepseek-ai/dsh-agent', AgentRegistry],
     ['@deepseek-ai/dsh-agent-loop', AgentLoop], ['@deepseek-ai/dsh-subprocess-local', LocalSubprocess],
-    ['@deepseek-ai/dsh-user-questions', UserQuestions], ['dsh-machine-apps/machines', MachineManagement],
+    ['@deepseek-ai/dsh-user-questions', UserQuestions], ['dsh-control-studio/machines', MachineManagement],
     ['@deepseek-ai/dsh-app-cards', AppCards],
   ])
   ctx.loader.internal = {

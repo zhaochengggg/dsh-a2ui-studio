@@ -14,7 +14,7 @@
     model: deepseek-v4-flash
 - insert:
     - id: machine-mgmt
-      name: 'dsh-machine-apps/machines'
+      name: 'dsh-control-studio/machines'
       config:
         catalogPath: !!js process.cwd() + '/.dsh/inventory'
         journalPath: !!js process.cwd() + '/.dsh/inventory.sqlite3'

@@ -1,10 +1,10 @@
-# DSH Machine & Apps
+# DSH Control Studio
 
 **Describe the controls you need. Keep a panel you can use.**
 
 A DeepSeek Harness plugin for agent-authored, persistent monitoring and control panels, attached to the machines they operate on.
 
-[中文](README.zh-CN.md) · [Download v0.3.0](https://github.com/zhaochengggg/dsh-machine-apps/releases/tag/v0.3.0) · [Setup](docs/setup.md) · [GPU walkthrough](docs/gpu-walkthrough.md)
+[中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [GPU walkthrough](docs/gpu-walkthrough.md)
 
 ![Real GPU monitoring card with per-device metrics and power controls](docs/media/gpu-panel.png)
 
@@ -39,21 +39,25 @@ The UI follows an **A2UI-inspired** approach: the agent describes a structured i
 Download and verify the prebuilt package:
 
 ```sh
-curl -fL -o dsh-machine-apps-0.3.0.tgz \
-  https://github.com/zhaochengggg/dsh-machine-apps/releases/download/v0.3.0/dsh-machine-apps-0.3.0.tgz
-echo 'c74f5f44cc495c5eccec1d6a6ce516c531bcd429adea94677718e975623b6f1d  dsh-machine-apps-0.3.0.tgz' | sha256sum -c -
+curl -fL -o dsh-control-studio-0.3.1.tgz \
+  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
+curl -fL -o SHA256SUMS \
+  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/SHA256SUMS
+sha256sum -c SHA256SUMS
 ```
 
 After the checksum reports `OK`, install as the DSH user:
 
 ```sh
-dsh plugin --profile web add ./dsh-machine-apps-0.3.0.tgz --allow-build=esbuild
+dsh plugin --profile web add ./dsh-control-studio-0.3.1.tgz --allow-build=esbuild
 dsh --profile web --dump-config
 ```
 
 Restart DSH and refresh the browser. Replace `web` with your profile name if needed. This is **one package**; no legacy plugins are required. Use the release tarball, not a git install. `--allow-build=esbuild` approves the extension builder's dependency script; see [setup and permissions](docs/setup.md) before enabling execution.
 
 ## Start with a read-only card
+
+Already using `dsh-machine-apps`? Follow the [rename migration guide](docs/migration.md) before installing. Do not enable both packages together.
 
 Open the machine panel, register a machine, and attach it with @. Ask the agent to use the bundled `machine-management` and `app-cards-authoring` skills to inspect the target and propose a read-only panel first. Add controls after confirming what each action executes.
 
@@ -67,4 +71,4 @@ Opening a card does not automatically apply its settings. Local execution is not
 - [Custom extension skill](apps/skills/app-cards-extensions/SKILL.md)
 - [Machine management skill](skills/machine-management/SKILL.md)
 
-Have an application you want to manage? [Open an issue](https://github.com/zhaochengggg/dsh-machine-apps/issues) with your DSH version, intended panel, and redacted logs or screenshots. Do not include credentials or private machine addresses.
+Have an application you want to manage? [Open an issue](https://github.com/zhaochengggg/dsh-control-studio/issues) with your DSH version, intended panel, and redacted logs or screenshots. Do not include credentials or private machine addresses.

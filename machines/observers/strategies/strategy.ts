@@ -1,7 +1,7 @@
 /**
  * Capability-rich read-only machine strategy contract.
  *
- * @module dsh-machine-apps/machines/strategies/strategy
+ * @module dsh-control-studio/machines/strategies/strategy
  */
 
 import type {
