@@ -6,7 +6,7 @@ This example comes from a real dual-V100 inference server. One GPU has less ther
 
 ![Real UI state walkthrough](media/control-studio-demo.gif)
 
-The looping GIF edits real UI captures into a side-by-side walkthrough. Telemetry is a captured snapshot; the control states show synchronized → independent → synchronized mode. No power-setting action was submitted. It is not an uninterrupted screen recording.
+The looping GIF is a continuous Playwright CLI recording of the actual DSH page, preserving the machine list and two-column GPU layout. Machine names, addresses and descriptions are replaced in the recording browser only; server records are unchanged. The controls show synchronized → independent → synchronized mode, including an unapplied slider adjustment that is restored to 200 W. No power-setting action was submitted.
 
 ## 1. Describe the job
 
