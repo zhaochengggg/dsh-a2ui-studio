@@ -40,6 +40,6 @@ These are actual DSH screenshots, not generated mockups or a fabricated conversa
 
 The queue is a JSON fixture in a separate demo workspace. The demo has its own DSH home and plugin copy, no production machine records, and no SSH connection. The process cannot see the production home directory; writes are confined to its demo tree. Registration of a local record is not evidence of a verified remote connection.
 
-The homepage uses independently readable static screenshots. The older long GIF started with manual registration and is retired from the current walkthrough; it is not the agent-led onboarding shown here.
+The homepage uses three separate short GIFs (8, 8 and 7.5 seconds): revisiting the agent's registration result, inspecting saved knowledge and the published panel, and attaching the machine with @. These are recordings of the completed demo, not a claim that generation finishes in eight seconds. No new inference request is submitted during this recording. The static screenshots above remain available for reading at your own pace. The older long GIF with manual registration remains retired.
 
 For a different application, see the [dual-GPU monitoring and power-control example](gpu-walkthrough.md). That is a previously deployed panel, not the output of this queue demo.

@@ -12,7 +12,9 @@ A DeepSeek Harness plugin for delegating machine and application management to y
 
 The agent checks existing records and uses `machine_manage` to create or update the machine archive. Supply connection details through your approved access setup when needed; manual registration is an optional fallback, not a prerequisite.
 
-![Actual agent conversation registering a demo machine](docs/media/agent-register.png)
+![Agent registration result and the saved machine archive](docs/media/agent-register.gif)
+
+*8 seconds · Review the completed agent registration and open its saved record.*
 
 ## 2. Turn application knowledge into a working panel
 
@@ -20,15 +22,19 @@ The agent checks existing records and uses `machine_manage` to create or update 
 
 The agent reads the application, records its location and purpose, and proposes a tailored card. You review the execution definitions before publication; the plugin keeps the notes, card versions and operation receipts.
 
-![Application knowledge saved in the machine archive](docs/media/agent-notes.png)
+![Saved application knowledge and the published card](docs/media/agent-card.gif)
+
+*8 seconds · Inspect the saved application notes and refresh the published panel.*
 
 ## 3. Use it directly—or delegate the next job
 
 Open the machine to use its saved panel. Click **@** when you want the agent to investigate or change something; it can retrieve the existing context instead of starting from scratch.
 
-![Persistent queue panel with machine reference control](docs/media/agent-panel.png)
+![Reference the machine in a conversation with @](docs/media/agent-mention.gif)
 
-*Real DSH screenshots, fictional local demo data. No production records or SSH access are used. [How this demo was made](docs/story.md).* The plugin keeps knowledge the agent explicitly saves; it does not automatically remember every conversation.
+*7.5 seconds · Attach the machine to chat; no new request is submitted.*
+
+*Three short recordings of real DSH, using fictional local demo data. Completed results are revisited, not presented as live generation. [Details and still images](docs/story.md).* The plugin keeps knowledge the agent explicitly saves; it does not automatically remember every conversation.
 
 Another application: [dual-GPU monitoring and power controls](docs/gpu-walkthrough.md). The same workflow can leave you a very different interface.
 
