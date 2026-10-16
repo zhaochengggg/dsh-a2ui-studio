@@ -4,6 +4,10 @@
 
 This example comes from a real dual-V100 inference server. One GPU has less thermal headroom than the other. A useful panel should make differences visible and let the operator adjust both devices together or independently.
 
+![Real UI state walkthrough](media/control-studio-demo.gif)
+
+The looping GIF edits real UI captures into a side-by-side walkthrough. Telemetry is a captured snapshot; the control states show synchronized → independent → synchronized mode. No power-setting action was submitted. It is not an uninterrupted screen recording.
+
 ## 1. Describe the job
 
 Register the machine and attach it to the conversation. An example request:

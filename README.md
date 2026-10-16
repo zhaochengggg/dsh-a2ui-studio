@@ -6,11 +6,9 @@ A DeepSeek Harness plugin for agent-authored, persistent monitoring and control 
 
 [中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [GPU walkthrough](docs/gpu-walkthrough.md)
 
-![Real GPU monitoring card with per-device metrics and power controls](docs/media/gpu-panel.png)
+![DSH Control Studio demo: telemetry and switching between shared and per-GPU controls](docs/media/control-studio-demo.gif)
 
-![Synchronized GPU power controls in the same card](docs/media/gpu-controls.png)
-
-*A real agent-authored dual-V100 panel in DSH. This is an example card, not a built-in GPU dashboard; the plugin is not GPU-specific.*
+*Edited from real UI captures: inspect telemetry, switch to independent controls, then return to synchronized mode. No settings were applied. This agent-authored dual-V100 panel is an example, not a built-in GPU dashboard; the plugin is not GPU-specific.*
 
 ## From a request to a reusable panel
 

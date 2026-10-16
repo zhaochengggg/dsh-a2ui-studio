@@ -6,11 +6,9 @@ DeepSeek Harness 的机器与应用管理插件：Agent 为实际应用编写定
 
 [English](README.md) · [下载 v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [安装与维护](docs/setup.zh-CN.md) · [GPU 示例](docs/gpu-walkthrough.md)
 
-![真实双 V100 卡片：逐卡指标、连续色阶与同步功耗设置](docs/media/gpu-panel.png)
+![DSH Control Studio 演示：查看指标、切换独立设置、恢复同步设置](docs/media/control-studio-demo.gif)
 
-![同一卡片的同步设置与功耗操作区](docs/media/gpu-controls.png)
-
-*运行在 DSH 中的真实卡片，不是效果图。双 V100 只是一个使用案例，并非安装后自带的固定 GPU 面板；插件不局限于 GPU。截图仅包含应用区域。*
+*由真实界面截图剪辑：查看指标 → 独立设置 → 恢复同步。未提交任何参数修改，仅展示应用区域。双 V100 是 Agent 编写的使用案例，并非安装后自带的固定面板；插件不局限于 GPU。*
 
 ## 怎么用
 
