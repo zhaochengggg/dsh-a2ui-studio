@@ -1,22 +1,28 @@
 # DSH Control Studio
 
-**Describe the controls you need. Keep a panel you can use.**
+**Your agent manages. Control Studio remembers.**
 
-A DeepSeek Harness plugin for agent-authored, persistent monitoring and control panels, attached to the machines they operate on.
+A DeepSeek Harness plugin that gives your agent a lasting place for machines, application knowledge, and everyday controls. Register a machine, bring it into a conversation with @, and ask the agent to manage its applications. Keep the records and panels after the conversation ends.
 
-[中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [GPU walkthrough](docs/gpu-walkthrough.md)
+[中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [End-to-end walkthrough](docs/story.md)
 
-![DSH Control Studio demo: telemetry and switching between shared and per-GPU controls](docs/media/control-studio-demo.gif)
+![Register a machine, reference it in chat, and ask the agent to build an application panel](docs/media/control-studio-story.gif)
 
-*Recorded directly in the real DSH interface: switch to independent GPU controls, adjust an unapplied value, then restore synchronized mode. Machine names, addresses and descriptions are anonymized in the recording browser only. No settings were applied. This agent-authored dual-V100 panel is an example, not a built-in GPU dashboard.*
+*Real DSH UI in a separate demo environment. Example machine and task-queue data; no production records. Edited recording with an approval screenshot; generation waits shortened. See [recording details](docs/story.md).*
 
-## From a request to a reusable panel
+## From a machine to an ongoing working relationship
 
-1. **Describe the job.** Attach a registered machine to the conversation and explain what you want to monitor or control.
-2. **Review the actual UI.** The agent uses bundled skills to inspect the application, propose a card, and preview the real renderer. Review actions and permissions before use.
-3. **Use it directly.** Return to the machine's panel to read status, change a setting, or inspect an action receipt—without asking the model to repeat the same operation each time.
+1. **Register the machine.** Give it a name and purpose. Add SSH connection details when needed, or register first and connect later. The directory keeps the machine identity and connection choices together.
+2. **Bring it into the conversation.** Click @ on the machine. The agent can use the plugin tools to retrieve its notes and connections instead of asking you to repeat them.
+3. **Delegate application work.** Ask the agent to inspect an application, document its configuration, diagnose a problem, or propose a monitoring panel. The agent uses its tools and your granted access; the plugin keeps records it explicitly saves.
+4. **Review the result.** Inspect the proposed UI and approve its execution definitions. A generated button is not permission to run arbitrary commands.
+5. **Come back and continue.** Use the saved panel directly, or @ the same machine in another conversation. Machine notes, important history, card revisions, and action receipts remain available.
 
-For example: “Compare both GPUs at a glance, highlight thermal pressure, and let me set their power limits together or separately.” [See the workflow →](docs/gpu-walkthrough.md)
+> “Manage the task queue on this machine. Remember where it lives and show me running, waiting, completed, and failed jobs in a panel.”
+
+The agent does the reasoning and application work. Control Studio supplies the persistent machine context and UI. It does not automatically archive every conversation or grant unrestricted access.
+
+For a second real-world example, see the [dual-GPU monitoring and power-control panel](docs/gpu-walkthrough.md).
 
 ## What is included
 
