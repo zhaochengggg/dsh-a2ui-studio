@@ -2,27 +2,35 @@
 
 **Your agent manages. Control Studio remembers.**
 
-A DeepSeek Harness plugin that gives your agent a lasting place for machines, application knowledge, and everyday controls. Register a machine, bring it into a conversation with @, and ask the agent to manage its applications. Keep the records and panels after the conversation ends.
+A DeepSeek Harness plugin for delegating machine and application management to your agent. Describe the target and the job; the agent can register the machine, investigate its applications, save what matters, and build an interface you can use again.
 
 [中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [End-to-end walkthrough](docs/story.md)
 
-![Register a machine, reference it in chat, and ask the agent to build an application panel](docs/media/control-studio-story.gif)
+## 1. Tell the agent what to manage
 
-*Real DSH UI in a separate demo environment. Example machine and task-queue data; no production records. Edited recording with an approval screenshot; generation waits shortened. See [recording details](docs/story.md).*
+> “Register this machine as Queue server. Find the queue application and remember where it lives.”
 
-## From a machine to an ongoing working relationship
+The agent checks existing records and uses `machine_manage` to create or update the machine archive. Supply connection details through your approved access setup when needed; manual registration is an optional fallback, not a prerequisite.
 
-1. **Register the machine.** Give it a name and purpose. Add SSH connection details when needed, or register first and connect later. The directory keeps the machine identity and connection choices together.
-2. **Bring it into the conversation.** Click @ on the machine. The agent can use the plugin tools to retrieve its notes and connections instead of asking you to repeat them.
-3. **Delegate application work.** Ask the agent to inspect an application, document its configuration, diagnose a problem, or propose a monitoring panel. The agent uses its tools and your granted access; the plugin keeps records it explicitly saves.
-4. **Review the result.** Inspect the proposed UI and approve its execution definitions. A generated button is not permission to run arbitrary commands.
-5. **Come back and continue.** Use the saved panel directly, or @ the same machine in another conversation. Machine notes, important history, card revisions, and action receipts remain available.
+![Actual agent conversation registering a demo machine](docs/media/agent-register.png)
 
-> “Manage the task queue on this machine. Remember where it lives and show me running, waiting, completed, and failed jobs in a panel.”
+## 2. Turn application knowledge into a working panel
 
-The agent does the reasoning and application work. Control Studio supplies the persistent machine context and UI. It does not automatically archive every conversation or grant unrestricted access.
+> “Show running, waiting, completed and failed jobs, with concurrency. Start read-only.”
 
-For a second real-world example, see the [dual-GPU monitoring and power-control panel](docs/gpu-walkthrough.md).
+The agent reads the application, records its location and purpose, and proposes a tailored card. You review the execution definitions before publication; the plugin keeps the notes, card versions and operation receipts.
+
+![Application knowledge saved in the machine archive](docs/media/agent-notes.png)
+
+## 3. Use it directly—or delegate the next job
+
+Open the machine to use its saved panel. Click **@** when you want the agent to investigate or change something; it can retrieve the existing context instead of starting from scratch.
+
+![Persistent queue panel with machine reference control](docs/media/agent-panel.png)
+
+*Real DSH screenshots, fictional local demo data. No production records or SSH access are used. [How this demo was made](docs/story.md).* The plugin keeps knowledge the agent explicitly saves; it does not automatically remember every conversation.
+
+Another application: [dual-GPU monitoring and power controls](docs/gpu-walkthrough.md). The same workflow can leave you a very different interface.
 
 ## What is included
 
@@ -63,7 +71,7 @@ Restart DSH and refresh the browser. Replace `web` with your profile name if nee
 
 Already using `dsh-machine-apps`? Follow the [rename migration guide](docs/migration.md) before installing. Do not enable both packages together.
 
-Open the machine panel, register a machine, and attach it with @. Ask the agent to use the bundled `machine-management` and `app-cards-authoring` skills to inspect the target and propose a read-only panel first. Add controls after confirming what each action executes.
+Ask the agent to use `machine-management` to register the target and record its connection, then `app-cards-authoring` to inspect the application and propose a read-only panel. For a machine already in the directory, reference it with @. Add controls after confirming what each action executes.
 
 Opening a card does not automatically apply its settings. Local execution is not authorized by default. This plugin does not change network exposure, proxies, authentication, or GPU services during installation.
 

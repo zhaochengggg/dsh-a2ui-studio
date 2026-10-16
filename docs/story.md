@@ -1,57 +1,45 @@
-# From a machine to a working interface
+# Give the job to the agent
 
 [English overview](../README.md) · [中文首页](../README.zh-CN.md)
 
-Control Studio gives an agent somewhere to keep machine knowledge and somewhere to leave useful application interfaces. The workflow starts with a machine, not a dashboard template.
+Control Studio is a place for an agent to keep machine knowledge and leave useful application interfaces. You describe the job; registration is part of the agent's work, not a form you must fill out first.
 
-## 1. Register the machine
+## Tell it which machine and what you want
 
-Open **Machines → Register machine**. Give it a name and a purpose. Add an SSH connection when remote access is needed; an inventory entry can also exist without one. Registration records an identity—it does not deploy software or grant unrestricted access.
+> Register this machine as Queue server. Read the application documentation and remember where the queue lives.
 
-In this recording, **演示服务器** (“Demo server”) manages a small example task queue in an isolated local workspace. No SSH connection is configured. For a real remote application, register its actual SSH connection and verify the host identity before asking the agent to work on it.
+The bundled `machine-management` skill teaches the agent to check the directory, inspect existing records and call `machine_manage` to create or update an archive. Machine identity stays stable when an address changes. Remote access still needs an authorized SSH setup and a trusted host fingerprint; secrets should not be pasted into notes.
 
-## 2. Bring it into the conversation
+The manual registration/edit form remains available when you want direct control. It is not the primary onboarding path.
 
-Click **@** on the machine. The reference identifies which machine the agent should inspect with the plugin's tools. You can then describe the job in ordinary language:
+![Real agent registration conversation](media/agent-register.png)
 
-> Read this application's documentation and queue data. Record its purpose and location in the machine's notes. Build a read-only card showing running, waiting, completed and failed jobs, plus concurrency. Propose it for review before publishing.
+## Ask for an application-specific interface
 
-The demo additionally tells the agent to use the bundled `machine-management` and `app-cards-authoring` skills, use the isolated host context, and leave production services untouched.
+> Make a read-only panel showing running, waiting, completed and failed jobs, plus concurrency.
 
-## 3. Let the agent do the application-specific work
+With `app-cards-authoring`, the agent investigates the data source, saves the important facts, and proposes a card. You review the execution definitions before publication. For an existing application it can reuse a known layout, or design a different one when the job needs it.
 
-The agent reads `README.md` and `queue.json`, updates the machine notes, and authors a card declaration with a read probe and data bindings. Those steps happen in the actual DSH conversation; they are not a scripted chat transcript.
+![Saved application knowledge](media/agent-notes.png)
 
-![Application location and purpose saved by the agent](media/story-notes.png)
+## Come back and continue
 
-This is where different applications diverge. A queue needs counts; an inference server needs GPU telemetry and power controls; a service may need a health check and restart action. The plugin supplies records, rendering and review boundaries. The agent still has to understand the application and verify its proposed commands.
+The panel and notes stay in the machine archive. Read the panel directly for routine checks. Use **@** to bring that machine back into a conversation when you need diagnosis, configuration changes or a new interface. The plugin retains knowledge explicitly written by the agent, not every message in every chat.
 
-## 4. Review before use
+![Saved panel](media/agent-panel.png)
 
-Inspect the proposed card and the operations it defines. Publication and execution permissions are distinct. Start with read-only observation; add write actions only when their scope and consequences are clear.
+## 中文：交代目标，其余交给 Agent
 
-In this run, validation caught missing schema fields before publication. After reviewing the real first render, we asked for a UI-only refinement: a clearer title, compact status, and no whole-card alarm for a historical failure count. The final panel is revision 2; its read operation and execution permissions are unchanged. The demo is an actual reviewed workflow, not a guaranteed first-draft result.
+1. **让 Agent 纳管。** 提供机器线索和用途，它查重、登记、记录连接与说明。手动表单只是备用入口。
+2. **让 Agent 理解应用。** 它读取实际部署与数据源，把应用知识写回档案，提出专属卡片，交你审阅执行定义。
+3. **日常使用，继续委托。** 平时直接看卡片；需要处理问题就 @ 机器，利用已经留下的上下文继续工作。
 
-## 5. Come back without starting over
+## About these screenshots
 
-The machine notes and published card live beyond the conversation. Reopen the machine to inspect the application, or @ it in another conversation to continue work. The plugin retains explicitly saved knowledge; it does not silently turn every message into machine documentation.
+These are actual DSH screenshots, not generated mockups or a fabricated conversation. This run starts by asking the local model to register `queue-demo` (队列服务器); the agent calls the plugin tools and reads the demo application's files. A follow-up asks it to adapt a previously verified queue-card template for that new machine and submit it through the normal review tools.
 
-![Published task queue panel in the real machine page](media/story-panel.png)
+The queue is a JSON fixture in a separate demo workspace. The demo has its own DSH home and plugin copy, no production machine records, and no SSH connection. The process cannot see the production home directory; writes are confined to its demo tree. Registration of a local record is not evidence of a verified remote connection.
 
-## 中文：一次委托，留下下次可用的工作界面
+The homepage uses independently readable static screenshots. The older long GIF started with manual registration and is retired from the current walkthrough; it is not the agent-led onboarding shown here.
 
-**登记机器 → @ 给 Agent → 理解应用并记录 → 审阅卡片 → 日常直接使用。**
-
-登记时写清名称、用途；远程机器再添加 SSH 连接。点击机器上的 @ 把目标带入对话，让 Agent 读取应用、记录位置和配置、提出专属界面。确认数据来源与权限之后，卡片就留在机器下；下一次既可以直接看面板，也可以继续让 Agent 处理问题。
-
-这次用“任务队列”串起完整过程。另一个更接近日常运维的案例是[双 GPU 监控与功耗控制](gpu-walkthrough.md)。
-
-## Recording boundaries
-
-- Recorded in real DSH with Playwright CLI, using a separate DSH home, plugin copy and demo workspace.
-- Names and data are fictional from the start. Production machines, conversations and cards were not copied into the demo.
-- The agent actually reads the example files and authors the card. The GIF combines edited screen recordings with a labeled screenshot of the actual approval prompt. Generation and troubleshooting waits are shortened; it is not a real-time speed benchmark or a promise of one-shot generation.
-- The demo process has a read-only system filesystem, a hidden production home directory, and write access limited to its own demo tree. The application is a local JSON fixture, not a production queue or an SSH connectivity test.
-- The separate [GPU recording](gpu-walkthrough.md) shows a previously deployed control panel; it is not presented as the output of this queue conversation.
-
-The demo does not require changing your production records to follow along. Use your own test machine and a small read-only application first.
+For a different application, see the [dual-GPU monitoring and power-control example](gpu-walkthrough.md). That is a previously deployed panel, not the output of this queue demo.

@@ -10,7 +10,7 @@ The looping GIF is a continuous Playwright CLI recording of the actual DSH page,
 
 ## 1. Describe the job
 
-Register the machine and attach it to the conversation. An example request:
+Ask the agent to register the machine with the `machine-management` tools, or reference an existing machine with @. An example application request:
 
 > Use the machine-management and app-cards-authoring skills. First inspect the GPUs read-only. Propose a persistent panel comparing temperature, power, memory use, utilization, and clock speed for both GPUs, with explicit units. Use each device's physical power limit as the gauge maximum, and mark the configured limit separately. Make thermal pressure visible. Add a “set both GPUs together” checkbox and power sliders, but do not change any settings before I review the actions and permissions. Show the real card preview before publishing.
 

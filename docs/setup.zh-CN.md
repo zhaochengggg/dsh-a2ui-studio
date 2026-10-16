@@ -38,7 +38,7 @@ DSH 对同一行的 config 使用替换语义；已有配置时请保留其他�
 
 ## 使用
 
-在机器面板登记机器与连接，查看连接状态，通过 @ 气泡将机器附加到对话。应用卡片在机器详情中展示；模型通过配套 `machine-management`、`app-cards-authoring` 和 `app-cards-extensions` skills 了解工具、声明格式、真实预览与扩展流程。
+在对话中让 Agent 使用 `machine-management` 登记机器、维护连接并记录用途；机器面板中的手动表单是备用入口。之后可以查看连接状态，通过 @ 气泡将已有机器附加到对话。应用卡片在机器详情中展示；模型通过配套 `app-cards-authoring` 和 `app-cards-extensions` skills 了解声明格式、真实预览与扩展流程。
 
 卡片发布、执行审批和回执独立于外观声明。修改功耗等操作不会因为打开页面或安装插件自动执行。
 
