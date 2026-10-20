@@ -1,7 +1,7 @@
 {
   "name": "dsh-control-studio",
   "version": "0.3.1",
-  "description": "DSH Control Studio: agent-authored monitoring and control panels for machines and apps",
+  "description": "DSH A2UI Studio: A2UI-inspired, agent-authored interfaces for managing machines and apps",
   "type": "module",
   "engines": {
     "node": ">=22.13.0"

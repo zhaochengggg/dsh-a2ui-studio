@@ -2,7 +2,7 @@
 
 [English overview](../README.md) · [中文首页](../README.zh-CN.md)
 
-Control Studio is a place for an agent to keep machine knowledge and leave useful application interfaces. You describe the job; registration is part of the agent's work, not a form you must fill out first.
+A2UI Studio is a place for an agent to keep machine knowledge and leave useful application interfaces. You describe the job; registration is part of the agent's work, not a form you must fill out first.
 
 ## Tell it which machine and what you want
 

@@ -1,5 +1,7 @@
 # 安装与维护
 
+DSH A2UI Studio 的安装标识仍为 `dsh-control-studio`；展示名称变更不要求已有用户重新安装或迁移数据。
+
 [项目首页](../README.md) · [中文首页](../README.zh-CN.md)
 
 DeepSeek Harness 的统一机器与应用管理插件。一个安装包提供机器目录、SSH 连接探测、机器引用，以及模型编写的应用监控/控制卡片；附带三套使用与扩展 skills。非 DeepSeek 官方插件。

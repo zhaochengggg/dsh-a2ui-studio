@@ -1,10 +1,10 @@
-# DSH Control Studio
+# DSH A2UI Studio
 
-**你的机器与应用，由 Agent 管理，由 Control Studio 记住。**
+**你的机器与应用，由 Agent 管理，由 A2UI Studio 记住。**
 
 把机器和应用交给 DeepSeek Harness 中的 Agent 管理。你交代目标与需求，Agent 可以完成机器登记、应用调查、知识记录和专属界面生成；插件把这些成果留给下一次使用。
 
-[English](README.md) · [下载 v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [安装与维护](docs/setup.zh-CN.md) · [完整使用故事](docs/story.md)
+[English](README.md) · [下载 v0.3.1](https://github.com/zhaochengggg/dsh-a2ui-studio/releases/tag/v0.3.1) · [安装与维护](docs/setup.zh-CN.md) · [完整使用故事](docs/story.md)
 
 ## 1. 交代目标，Agent 完成纳管
 
@@ -52,15 +52,17 @@ Agent 读取应用、记录用途与位置，再提出适合这个应用的卡�
 
 ## 安装
 
+原名 DSH Control Studio。安装包和插件标识暂时保留 `dsh-control-studio`，保证已有安装兼容；本次展示名称变更无需迁移数据或重新安装。
+
 **当前为预发布版。已验证 Linux、DSH `0.2.1-alpha.1`、Node `24.19`。** 其他 DSH 版本可能需要适配。非 DeepSeek 官方插件。
 
 先下载并校验：
 
 ```sh
 curl -fL -o dsh-control-studio-0.3.1.tgz \
-  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
+  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
 curl -fL -o SHA256SUMS \
-  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/SHA256SUMS
+  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.1/SHA256SUMS
 sha256sum -c SHA256SUMS
 ```
 
@@ -81,4 +83,4 @@ dsh --profile web --dump-config
 
 本地执行默认未授权；远程操作使用登记的 SSH 身份。打开卡片不会自动应用设置。安装插件也不会修改网络开放、代理、认证或 GPU 服务。目录白名单、数据路径、备份与升级见[安装与维护](docs/setup.zh-CN.md)。
 
-想接入自己的应用？欢迎[提交 issue](https://github.com/zhaochengggg/dsh-control-studio/issues)，说明 DSH 版本、想要的面板和脱敏后的错误信息。不要上传凭据或私有机器地址。
+想接入自己的应用？欢迎[提交 issue](https://github.com/zhaochengggg/dsh-a2ui-studio/issues)，说明 DSH 版本、想要的面板和脱敏后的错误信息。不要上传凭据或私有机器地址。

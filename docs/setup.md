@@ -1,5 +1,7 @@
 # Setup and maintenance
 
+DSH A2UI Studio keeps the installation ID `dsh-control-studio`. Existing installations do not need migration for the display-name change.
+
 [Overview](../README.md) · [完整中文说明](setup.zh-CN.md)
 
 Verified on **Linux, DeepSeek Harness `0.2.1-alpha.1`, Node `24.19`**. Node `22.13` is the API minimum, not a tested configuration. Newer DSH releases are not automatically compatible.

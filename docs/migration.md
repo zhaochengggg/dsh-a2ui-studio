@@ -1,6 +1,14 @@
-# Rename to DSH Control Studio / 改名迁移
+# Naming and migration / 名称与迁移
 
-Version 0.3.1 renames `dsh-machine-apps` to `dsh-control-studio`. This is the same unified plugin, not a second service. The GitHub repository is now `zhaochengggg/dsh-control-studio`.
+## Current name: DSH A2UI Studio
+
+The project and GitHub repository are now named **DSH A2UI Studio** / `zhaochengggg/dsh-a2ui-studio`. The package, bundle and RPC identifiers remain `dsh-control-studio`. Existing installations require **no reinstall, configuration edit, restart or data migration** for this branding change. Published v0.3.1 tarball names and checksums are unchanged.
+
+当前展示名为 **DSH A2UI Studio**，仓库为 `dsh-a2ui-studio`；安装包与运行时标识仍是 `dsh-control-studio`。本次只改展示名称，不改机器、应用卡片、会话和授权数据。下面的迁移步骤仅适用于更早的 `dsh-machine-apps`，已安装 `dsh-control-studio` 的用户不需要执行。
+
+## Historical v0.3.1 package rename
+
+Version 0.3.1 renamed `dsh-machine-apps` to `dsh-control-studio`. This is the same unified plugin, not a second service.
 
 ## What stays stable
 

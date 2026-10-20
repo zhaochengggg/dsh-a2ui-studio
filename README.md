@@ -1,10 +1,10 @@
-# DSH Control Studio
+# DSH A2UI Studio
 
-**Your agent manages. Control Studio remembers.**
+**Your agent manages. A2UI Studio remembers.**
 
 A DeepSeek Harness plugin for delegating machine and application management to your agent. Describe the target and the job; the agent can register the machine, investigate its applications, save what matters, and build an interface you can use again.
 
-[中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-control-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [End-to-end walkthrough](docs/story.md)
+[中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-a2ui-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [End-to-end walkthrough](docs/story.md)
 
 ## 1. Tell the agent what to manage
 
@@ -52,15 +52,17 @@ The UI follows an **A2UI-inspired** approach: the agent describes a structured i
 
 ## Install
 
+Previously called DSH Control Studio. The install/package ID remains `dsh-control-studio` for compatibility; existing installations need no migration for this branding change.
+
 **Prerelease. Verified: Linux · DSH `0.2.1-alpha.1` · Node `24.19`.** Other DSH versions may require adaptation. Independent community project, not an official DeepSeek plugin.
 
 Download and verify the prebuilt package:
 
 ```sh
 curl -fL -o dsh-control-studio-0.3.1.tgz \
-  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
+  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
 curl -fL -o SHA256SUMS \
-  https://github.com/zhaochengggg/dsh-control-studio/releases/download/v0.3.1/SHA256SUMS
+  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.1/SHA256SUMS
 sha256sum -c SHA256SUMS
 ```
 
@@ -89,4 +91,4 @@ Opening a card does not automatically apply its settings. Local execution is not
 - [Custom extension skill](apps/skills/app-cards-extensions/SKILL.md)
 - [Machine management skill](skills/machine-management/SKILL.md)
 
-Have an application you want to manage? [Open an issue](https://github.com/zhaochengggg/dsh-control-studio/issues) with your DSH version, intended panel, and redacted logs or screenshots. Do not include credentials or private machine addresses.
+Have an application you want to manage? [Open an issue](https://github.com/zhaochengggg/dsh-a2ui-studio/issues) with your DSH version, intended panel, and redacted logs or screenshots. Do not include credentials or private machine addresses.
