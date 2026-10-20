@@ -4,7 +4,7 @@ DSH A2UI Studio keeps the installation ID `dsh-control-studio`. Existing install
 
 [Overview](../README.md) · [完整中文说明](setup.zh-CN.md)
 
-Verified on **Linux, DeepSeek Harness `0.2.1-alpha.1`, Node `24.19`**. Node `22.13` is the API minimum, not a tested configuration. Newer DSH releases are not automatically compatible.
+Verified on Linux (DSH `0.2.1-alpha.1` and `0.2.1-rc.2`) and Windows Desktop Beta `2.0.18-beta.1` (DSH `0.2.1-rc.2`, Node `24.21.0`). See [Windows setup and limits](windows.md). Node `22.13` is the API minimum, not a tested configuration. Newer DSH releases are not automatically compatible.
 
 Follow the [download, checksum, and installation steps](../README.md#install). Run as the user who runs DSH, using the intended profile. SSH checks require `ssh`, `ssh-keyscan`, and `ssh-keygen`; optional libvirt observation requires `virsh`.
 

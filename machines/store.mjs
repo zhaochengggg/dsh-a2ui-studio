@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import {discover,connect,parseKeys,classify,problem,limited} from './probe.mjs';
+import {localSshPath,sshNullFile} from './ssh-paths.mjs';
 const ID = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 const hash = value => createHash('sha256').update(value).digest('hex');
 const stamp = () => new Date().toISOString();
@@ -30,7 +31,7 @@ export function validateMachine(raw) {
     const v = { id: id(c.id), host: text(c.host, 253), port: c.port ?? 22, user: text(c.user, 64), identityFile: text(c.identityFile ?? '', 1024), fingerprint: text(c.fingerprint ?? '', 128), label: text(c.label ?? '', 120) };
     if (!/^[a-zA-Z0-9][a-zA-Z0-9.:%_-]*$/.test(v.host) || !/^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$/.test(v.user)) fail('Invalid SSH host/user');
     if (!Number.isInteger(v.port) || v.port < 1 || v.port > 65535) fail('Invalid SSH port');
-    if (v.identityFile && (!v.identityFile.startsWith('/') || /[\r\n"\\%]/.test(v.identityFile))) fail('Identity must be a literal absolute path');
+    if (v.identityFile) v.identityFile=localSshPath(v.identityFile);
     if (v.fingerprint && !/^SHA256:[A-Za-z0-9+/]{43}=?$/.test(v.fingerprint)) fail('Expected SHA256 host-key fingerprint');
     return v;
   });
@@ -147,7 +148,7 @@ export class MachineStore {
     const {result,errors}=await this.all(); if(errors.length) fail('Invalid machine files; SSH projection not updated');
     let config='# Generated from machine records; edit machine.json, not this file.\n';
     for(const {machine:m} of result) if(!m.archived) for(const c of m.connections) {
-      config+=`\nHost dsh-${m.id}-${c.id}\n  HostName ${c.host}\n  Port ${c.port}\n  User ${c.user}\n  HostKeyAlias dsh-${m.id}-${c.id}\n  UserKnownHostsFile "${path.join(this.sshDir,'known_hosts')}"\n  GlobalKnownHostsFile /dev/null\n  StrictHostKeyChecking yes\n  BatchMode yes\n  ForwardAgent no\n  ForwardX11 no\n  ClearAllForwardings yes\n  PermitLocalCommand no\n  ProxyCommand none\n  ProxyJump none\n  PasswordAuthentication no\n  KbdInteractiveAuthentication no\n  ConnectTimeout 8\n`;
+      config+=`\nHost dsh-${m.id}-${c.id}\n  HostName ${c.host}\n  Port ${c.port}\n  User ${c.user}\n  HostKeyAlias dsh-${m.id}-${c.id}\n  UserKnownHostsFile "${localSshPath(path.join(this.sshDir,'known_hosts'))}"\n  GlobalKnownHostsFile ${sshNullFile()}\n  StrictHostKeyChecking yes\n  BatchMode yes\n  ForwardAgent no\n  ForwardX11 no\n  ClearAllForwardings yes\n  PermitLocalCommand no\n  ProxyCommand none\n  ProxyJump none\n  PasswordAuthentication no\n  KbdInteractiveAuthentication no\n  ConnectTimeout 8\n`;
       if(c.identityFile) config+=`  IdentityFile "${c.identityFile}"\n  IdentitiesOnly yes\n`;
     }
     await atomic(path.join(this.sshDir,'config'),config);

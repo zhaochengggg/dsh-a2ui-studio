@@ -4,7 +4,7 @@
 
 A DeepSeek Harness plugin for delegating machine and application management to your agent. Describe the target and the job; the agent can register the machine, investigate its applications, save what matters, and build an interface you can use again.
 
-[中文](README.zh-CN.md) · [Download v0.3.1](https://github.com/zhaochengggg/dsh-a2ui-studio/releases/tag/v0.3.1) · [Setup](docs/setup.md) · [End-to-end walkthrough](docs/story.md)
+[中文](README.zh-CN.md) · [Download v0.3.2](https://github.com/zhaochengggg/dsh-a2ui-studio/releases/tag/v0.3.2) · [Setup](docs/setup.md) · [End-to-end walkthrough](docs/story.md)
 
 ## 1. Tell the agent what to manage
 
@@ -54,22 +54,22 @@ The UI follows an **A2UI-inspired** approach: the agent describes a structured i
 
 Previously called DSH Control Studio. The install/package ID remains `dsh-control-studio` for compatibility; existing installations need no migration for this branding change.
 
-**Prerelease. Verified: Linux · DSH `0.2.1-alpha.1` · Node `24.19`.** Other DSH versions may require adaptation. Independent community project, not an official DeepSeek plugin.
+**Prerelease. Linux and Windows desktop; DSH `0.2.1-alpha.1` / `0.2.1-rc.2`.** See [Windows setup and limits](docs/windows.md). Independent community project, not an official DeepSeek plugin.
 
 Download and verify the prebuilt package:
 
 ```sh
-curl -fL -o dsh-control-studio-0.3.1.tgz \
-  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.1/dsh-control-studio-0.3.1.tgz
+curl -fL -o dsh-control-studio-0.3.2.tgz \
+  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.2/dsh-control-studio-0.3.2.tgz
 curl -fL -o SHA256SUMS \
-  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.1/SHA256SUMS
+  https://github.com/zhaochengggg/dsh-a2ui-studio/releases/download/v0.3.2/SHA256SUMS
 sha256sum -c SHA256SUMS
 ```
 
 After the checksum reports `OK`, install as the DSH user:
 
 ```sh
-dsh plugin --profile web add ./dsh-control-studio-0.3.1.tgz --allow-build=esbuild
+dsh plugin --profile web add ./dsh-control-studio-0.3.2.tgz --allow-build=esbuild
 dsh --profile web --dump-config
 ```
 

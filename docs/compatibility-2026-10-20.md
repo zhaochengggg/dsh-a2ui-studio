@@ -1,5 +1,8 @@
 # Compatibility audit — 2026-10-20
 
+This is the initial upgrade audit. Windows blockers below were subsequently
+addressed in v0.3.2; see [the Windows acceptance report](windows-acceptance-0.3.2.md).
+
 ## Linux: DSH 0.2.1-rc.2
 
 The existing deployment was upgraded from `0.2.1-alpha.1` to `0.2.1-rc.2`.

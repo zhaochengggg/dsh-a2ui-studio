@@ -53,6 +53,17 @@ function step(id: string, operation = id, after: readonly string[] = []): FlowOp
 }
 
 describe('application operation execution', () => {
+  it.skipIf(process.platform !== 'win32')('executes explicit PowerShell argv on Windows', async () => {
+    const {env,declaration}=await setup()
+    const operation: ExecOperation={...node(''),program:{
+      kind:'argv',executable:'powershell.exe',args:[
+        {literal:'-NoProfile'},{literal:'-NonInteractive'},{literal:'-Command'},
+        {literal:"[Console]::Write('{\"platform\":\"windows\",\"readonly\":true}')"},
+      ],
+    }}
+    expect(await executeOperation(declaration({run:operation}),'run',{},env))
+      .toMatchObject({state:'succeeded',value:{platform:'windows',readonly:true}})
+  })
   it('passes argv and env as literal values and rechecks authority immediately before spawn', async () => {
     const { env, declaration } = await setup()
     const beforeStep = vi.fn(async () => {})
@@ -94,7 +105,7 @@ describe('application operation execution', () => {
       .toMatchObject({ state: 'failed' })
   })
 
-  it('executes complete POSIX scripts with exact positional arguments and independent stdin', async () => {
+  it.skipIf(process.platform === 'win32')('executes complete POSIX scripts with exact positional arguments and independent stdin', async () => {
     const { env, declaration } = await setup()
     const operation: ExecOperation = {
       ...node(''), output: { decode: 'text', schema: { type: 'string' } },
@@ -139,7 +150,9 @@ describe('application operation execution', () => {
     const operation = { ...node('process.on("SIGTERM",()=>{console.log(0);process.exit(0)});setInterval(()=>{},1000)'), timeoutMs: 1500 }
     const result = await executeOperation(declaration({ run: operation }), 'run', {}, env)
     expect(result).toMatchObject({ state: 'failed', process: { timedOut: true, aborted: false } })
-    expect(result.process?.exitCode).toBe(0)
+    // Windows forcibly terminates the tree; POSIX delivers the catchable signal.
+    if (process.platform !== 'win32') expect(result.process?.exitCode).toBe(0)
+    else expect(result.process?.exitCode).not.toBeNull()
     const record = spawn.mock.results[0]
     if (record?.type !== 'return') throw new Error('Expected a spawned process handle')
     const handle: ReturnType<ExecutionEnvironment['subprocess']['spawn']> = record.value
@@ -160,12 +173,17 @@ describe('application operation execution', () => {
     const pending = executeOperation(document, 'run', {}, env)
     await ready
     controller.abort()
-    expect(await pending).toMatchObject({ state: 'cancelled', process: { aborted: true } })
+    const result = await pending
+    expect(result.state).toBe('cancelled')
+    if (result.process) expect(result.process.aborted).toBe(true)
+    const spawned = spawn.mock.results[0]
+    if (spawned?.type !== 'return') throw new Error('No spawned handle')
+    expect(await spawned.value.waitForExit(AbortSignal.timeout(2000))).toBe(true)
     expect(await executeOperation(document, 'run', {}, env)).toMatchObject({ state: 'cancelled' })
     expect(spawn).toHaveBeenCalledTimes(1)
   })
 
-  it('quotes SSH command data without modifying the reviewed prefix or running SSH in tests', async () => {
+  it.skipIf(process.platform === 'win32')('quotes SSH command data without modifying the reviewed prefix or running SSH in tests', async () => {
     const { env, cwd, declaration } = await setup()
     const original = env.subprocess.spawn.bind(env.subprocess)
     const captured: SubprocessSpawnSpec[] = []
@@ -190,11 +208,11 @@ describe('application operation execution', () => {
   })
 
   it('reports remote transport failure as indeterminate without retry', async () => {
-    const { env, declaration } = await setup()
+    const { env, cwd, declaration } = await setup()
     const original = env.subprocess.spawn.bind(env.subprocess)
     vi.spyOn(env.subprocess, 'resolveExecutable').mockResolvedValue('/resolved/ssh')
     const spawn = vi.spyOn(env.subprocess, 'spawn').mockImplementation(spec => original({
-      ...spec, argv: [process.execPath, '-e', 'process.exitCode=255'],
+      ...spec, cwd, argv: [process.execPath, '-e', 'process.exitCode=255'],
     }))
     const result = await executeOperation(declaration({ run: node('console.log(1)') }), 'run', {}, {
       ...env, contexts: { local: { kind: 'ssh', cwd: '/tmp', argvPrefix: ['ssh', '-F', '/tmp/config', 'alias'], identity: 'test', display: 'ssh' } },

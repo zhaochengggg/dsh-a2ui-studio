@@ -1,8 +1,10 @@
 {
   "name": "dsh-control-studio",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "DSH A2UI Studio: A2UI-inspired, agent-authored interfaces for managing machines and apps",
   "type": "module",
+  "repository": {"type":"git","url":"git+https://github.com/zhaochengggg/dsh-a2ui-studio.git"},
+  "homepage": "https://github.com/zhaochengggg/dsh-a2ui-studio#readme",
   "engines": {
     "node": ">=22.13.0",
     "dsh": "0.2.1-alpha.1 || 0.2.1-rc.2"
@@ -21,6 +23,7 @@
     "machines/index.mjs",
     "machines/store.mjs",
     "machines/probe.mjs",
+    "machines/ssh-paths.mjs",
     "machines/remote.mjs",
     "machines/observations.mjs",
     "machines/lib",
@@ -62,13 +65,13 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5-alpha.1",
-    "@deepseek-ai/dsh-tools": "0.2.1-alpha.1",
-    "@deepseek-ai/dsh-typert-protocol": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-tools": "0.2.1-alpha.1 || 0.2.1-rc.2",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-alpha.1 || 0.2.1-rc.2",
     "@deepseek-ai/schemastery": "~3.18.2",
-    "@deepseek-ai/dsh-agent": "0.2.1-alpha.1",
-    "@deepseek-ai/dsh-llm": "0.2.1-alpha.1",
-    "@deepseek-ai/dsh-session": "0.2.1-alpha.1",
-    "@deepseek-ai/dsh-util-values": "0.2.1-alpha.1"
+    "@deepseek-ai/dsh-agent": "0.2.1-alpha.1 || 0.2.1-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.1-alpha.1 || 0.2.1-rc.2",
+    "@deepseek-ai/dsh-session": "0.2.1-alpha.1 || 0.2.1-rc.2",
+    "@deepseek-ai/dsh-util-values": "0.2.1-alpha.1 || 0.2.1-rc.2"
   },
   "devDependencies": {
     "@deepseek-ai/cordis-plugin-loader": "1.0.6-alpha.1",

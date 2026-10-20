@@ -4,7 +4,7 @@
   "machineId": "example-host",
   "revision": 1,
   "apps": {
-    "example": { "name": "应用卡片示例", "description": "使用本地 printf 验证声明、授权与检查，不安装或修改服务。" }
+    "example": { "name": "应用卡片示例", "description": "使用本地 Node 验证声明、授权与检查，不安装或修改服务。" }
   },
   "contexts": { "local": { "kind": "host", "cwd": "/tmp" } },
   "data": { "title": "应用卡片示例" },
@@ -15,8 +15,8 @@
       "context": "local",
       "inputSchema": { "type": "object", "properties": {}, "additionalProperties": false },
       "program": {
-        "kind": "argv", "executable": "printf",
-        "args": [{ "literal": "%s" }, { "literal": "Application operation completed." }]
+        "kind": "argv", "executable": "node",
+        "args": [{ "literal": "-e" }, { "literal": "process.stdout.write('Application operation completed.')" }]
       },
       "output": { "decode": "text", "schema": { "type": "string" } },
       "successExitCodes": [0],

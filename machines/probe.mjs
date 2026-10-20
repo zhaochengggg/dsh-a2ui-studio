@@ -2,7 +2,31 @@
 import {createHash} from 'node:crypto';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
-export const execute=promisify(execFile);
+import {sshNullFile,sshOptionPath} from './ssh-paths.mjs';
+import {access} from 'node:fs/promises';
+import {join} from 'node:path';
+const exec=promisify(execFile);
+export async function execute(file,args,options) {
+  const settings={...options,windowsHide:true};
+  // Prefer Git's keyscan when installed: inbox keyscan may spend its entire
+  // timeout before reporting its unsupported-KEX defect, leaving no retry budget.
+  if(process.platform==='win32'&&file==='ssh-keyscan'){
+    for(const base of [process.env.ProgramFiles,process.env['ProgramFiles(x86)']].filter(Boolean)){
+      const candidate=join(base,'Git','usr','bin','ssh-keyscan.exe');
+      try{await access(candidate);}catch{continue;}
+      return exec(candidate,args,settings);
+    }
+  }
+  let result,error;
+  try{result=await exec(file,args,settings);}catch(e){error=e;}
+  // Windows inbox keyscan can advertise a KEX it cannot implement (Win32-OpenSSH #2140).
+  // Never confuse this client defect with packet loss or a host-key mismatch.
+  if(process.platform==='win32'&&file==='ssh-keyscan'&&/unsupported KEX method/i.test(String((error||result)?.stderr))){
+    throw problem('algorithm_unavailable','Windows ssh-keyscan 不支持服务器协商的算法；请更新 OpenSSH 或安装 Git for Windows。');
+  }
+  if(error)throw error;
+  return result;
+}
 export const fingerprintOf=key=>'SHA256:'+createHash('sha256').update(Buffer.from(key,'base64')).digest('base64').replace(/=+$/,'');
 export function parseKeys(stdout='') {
   return stdout.split('\n').flatMap(line=>{
@@ -23,11 +47,11 @@ export function classify(error) {
   return {code:'probe_error',message:'探测未完成。\n'+detail};
 }
 export async function discover(c,{run=execute,deadline=Date.now()+7000,scanMs=3000}={}) {
-  const abort=new AbortController(),evidence={};let found;
+  const abort=new AbortController(),evidence={};let found,fatal;
   const tasks=['ed25519','rsa','ecdsa'].map(async type=>{
     for(let attempt=1;attempt<=2&&!abort.signal.aborted;attempt++){
       const remaining=deadline-Date.now();if(remaining<100)break;
-      let out='';try{out=(await run('ssh-keyscan',['-T',String(Math.max(1,Math.ceil(Math.min(scanMs,remaining)/1000))),'-t',type,'-p',String(c.port),c.host],{signal:abort.signal,timeout:Math.min(scanMs+100,remaining),maxBuffer:65536,env:{...process.env,LC_ALL:'C'}})).stdout;}catch(e){out=e.stdout||'';}
+      let out='';try{out=(await run('ssh-keyscan',['-T',String(Math.max(1,Math.ceil(Math.min(scanMs,remaining)/1000))),'-t',type,'-p',String(c.port),c.host],{signal:abort.signal,timeout:Math.min(scanMs+100,remaining),maxBuffer:65536,env:{...process.env,LC_ALL:'C'}})).stdout;}catch(e){if(e.probeCode==='algorithm_unavailable'){fatal=e;return;}out=e.stdout||'';}
       if(abort.signal.aborted)return;
       const keys=parseKeys(out);evidence[type]={attempts:attempt,result:keys.length?'different':'missing'};
       const match=keys.find(k=>k.fingerprint===c.fingerprint.replace(/=+$/,''));
@@ -37,6 +61,7 @@ export async function discover(c,{run=execute,deadline=Date.now()+7000,scanMs=30
   });
   await Promise.all(tasks);
   if(found)return {key:found,evidence};
+  if(fatal)throw fatal;
   const complete=Object.values(evidence).length===3&&Object.values(evidence).every(e=>e.result==='different');
   const error=problem(complete?'identity_conflict':'identity_incomplete',complete?'已取得三类主机密钥，但均不符合登记指纹；已阻断连接。':'未取得足够的主机密钥证据，身份核验未完成；未将超时判成指纹不匹配。');
   error.evidence=evidence;throw error;
@@ -50,12 +75,13 @@ export async function connect(c,alias,knownHosts,key,{run=execute,deadline=Date.
   for(let attempt=1;attempt<=2;attempt++){
     const remaining=deadline-Date.now();if(remaining<100)throw problem('network_failed','连接探测已达到总时间上限。');
     const budget=Math.min(attemptMs,remaining);
-    const options={HostName:c.host,Port:c.port,User:c.user,HostKeyAlias:alias,UserKnownHostsFile:knownHosts,GlobalKnownHostsFile:'/dev/null',StrictHostKeyChecking:'yes',UpdateHostKeys:'no',BatchMode:'yes',ControlMaster:'no',ControlPath:'none',ForwardAgent:'no',ForwardX11:'no',ClearAllForwardings:'yes',PermitLocalCommand:'no',ProxyCommand:'none',ProxyJump:'none',PasswordAuthentication:'no',KbdInteractiveAuthentication:'no',ConnectionAttempts:1,ConnectTimeout:Math.max(1,Math.ceil(budget/1000)),HostKeyAlgorithms:hostAlgorithms(key.type)};
-    if(c.identityFile){options.IdentityFile=c.identityFile;options.IdentitiesOnly='yes';}
-    const args=['-F','/dev/null',...Object.entries(options).flatMap(([k,v])=>['-o',`${k}=${v}`]),alias,'printf "DSH_MACHINE_OK\\n"; hostname'];
+    const options={HostName:c.host,Port:c.port,User:c.user,HostKeyAlias:alias,UserKnownHostsFile:sshOptionPath(knownHosts),GlobalKnownHostsFile:sshNullFile(),StrictHostKeyChecking:'yes',UpdateHostKeys:'no',BatchMode:'yes',ControlMaster:'no',ControlPath:'none',ForwardAgent:'no',ForwardX11:'no',ClearAllForwardings:'yes',PermitLocalCommand:'no',ProxyCommand:'none',ProxyJump:'none',PasswordAuthentication:'no',KbdInteractiveAuthentication:'no',ConnectionAttempts:1,ConnectTimeout:Math.max(1,Math.ceil(budget/1000)),HostKeyAlgorithms:hostAlgorithms(key.type)};
+    if(c.identityFile){options.IdentityFile=sshOptionPath(c.identityFile);options.IdentitiesOnly='yes';}
+    const args=['-F',sshNullFile(),...Object.entries(options).flatMap(([k,v])=>['-o',`${k}=${v}`]),alias,'echo DSH_MACHINE_OK && hostname'];
     try{const r=await run('ssh',args,{timeout:budget,maxBuffer:8192,env:{...process.env,LC_ALL:'C'}});
-      if(!r.stdout.startsWith('DSH_MACHINE_OK\n'))throw problem('probe_error','SSH 已响应，但探测命令返回格式异常。');
-      return {hostname:r.stdout.split('\n')[1],attempts:attempt};
+      const stdout=r.stdout.replaceAll('\r\n','\n');
+      if(!stdout.startsWith('DSH_MACHINE_OK\n'))throw problem('probe_error','SSH 已响应，但探测命令返回格式异常。');
+      return {hostname:stdout.split('\n')[1],attempts:attempt};
     }catch(e){if(attempt===2||classify(e).code!=='network_failed'||deadline-Date.now()<100){e.attempts=attempt;throw e;}}
   }
 }

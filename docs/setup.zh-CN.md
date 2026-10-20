@@ -8,7 +8,7 @@ DeepSeek Harness 的统一机器与应用管理插件。一个安装包提供机
 
 ## 支持范围
 
-已验证 Linux、DeepSeek Harness `0.2.1-alpha.1`、Node `24.19`。Node `22.13` 是 API 最低要求，尚未实测；建议使用已验证版本。DSH 仍在快速迭代，不承诺跨版本兼容。
+已验证 Linux（DSH `0.2.1-alpha.1` / `0.2.1-rc.2`）与 Windows Desktop Beta `2.0.18-beta.1`（DSH `0.2.1-rc.2`、Node `24.21.0`）。[Windows 安装与能力边界](windows.md)。Node `22.13` 是 API 最低要求，尚未实测。DSH 仍在快速迭代，不承诺跨版本兼容。
 
 SSH 探测需要 `ssh`、`ssh-keyscan`、`ssh-keygen`。可选 libvirt 观察需要 `virsh`。插件不会修改局域网开放、代理、认证或 GPU 服务。
 
@@ -19,7 +19,7 @@ SSH 探测需要 `ssh`、`ssh-keyscan`、`ssh-keygen`。可选 libvirt 观察需
 下载与 SHA256 校验命令见[中文首页](../README.zh-CN.md#安装)，确认校验通过后继续。
 
 ```sh
-dsh plugin --profile web add ./dsh-control-studio-0.3.1.tgz --allow-build=esbuild
+dsh plugin --profile web add ./dsh-control-studio-0.3.2.tgz --allow-build=esbuild
 dsh --profile web --dump-config
 ```
 

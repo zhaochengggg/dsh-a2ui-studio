@@ -3,12 +3,17 @@ import assert from 'node:assert/strict';
 import * as fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {discover,connect,parseKeys,fingerprintOf,classify} from './probe.mjs';
+import {discover,connect as connectRaw,parseKeys,fingerprintOf,classify} from './probe.mjs';
+const connect=(c,alias,known,key,options)=>connectRaw(c,alias,path.resolve(known),key,options);
 import {MachineStore} from './store.mjs';
 import {connectionStatus,probeTooltip} from './controller.mjs';
 function key(type,content='test'){const n=Buffer.alloc(4);n.writeUInt32BE(type.length);return Buffer.concat([n,Buffer.from(type),Buffer.from(content)]).toString('base64');}
 const good=key('ssh-ed25519'),bad=key('ssh-ed25519','other');
 const c={id:'lan',host:'192.0.2.1',port:22,user:'root',fingerprint:fingerprintOf(good)};
+test('client algorithm defects are not reported as missing network evidence',async()=>{
+ await assert.rejects(discover(c,{run:async()=>{throw Object.assign(new Error('unsupported KEX'),{probeCode:'algorithm_unavailable'});}}),
+ e=>e.probeCode==='algorithm_unavailable');
+});
 test('missing registered type plus other nonmatches is incomplete, not mismatch; retries only missing',async()=>{
   const calls={};const run=async(_,args)=>{const t=args[args.indexOf('-t')+1];calls[t]=(calls[t]||0)+1;return {stdout:t==='ed25519'?'':`host ssh-${t} ${key('ssh-'+t)}\n`};};
   await assert.rejects(discover(c,{run}),e=>e.probeCode==='identity_incomplete');assert.deepEqual(calls,{ed25519:2,rsa:1,ecdsa:1});
