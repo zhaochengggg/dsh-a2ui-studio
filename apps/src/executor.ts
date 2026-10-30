@@ -1,11 +1,12 @@
 /** Bounded primitive execution through the subprocess provider and finite dependency graphs. @module @deepseek-ai/dsh-app-cards/executor */
 
-import { basename, dirname } from 'node:path'
+import { dirname } from 'node:path'
 import type { SubprocessRuntime } from '@deepseek-ai/dsh-subprocess'
 import { validateJsonSchemaValue } from '@deepseek-ai/dsh-tools'
 import type { JsonSchemaNode } from '@deepseek-ai/dsh-tools'
 import { isJsonValue } from '@deepseek-ai/dsh-util-values'
 import { z } from 'zod/v3'
+import { detectRemote, remoteInvocation, remoteCompletion, scriptArgv } from '../../shared/remote-execution.mjs'
 import { resolveBinding } from './declaration.ts'
 import { AppCardError, errorMessage } from './errors.ts'
 import { evaluateExpression } from './expression.ts'
@@ -81,19 +82,12 @@ function stringValue(binding: Binding, input: JsonValue, declaration: CardDeclar
   return value
 }
 
-function quotePosix(value: string): string {
-  if (value.includes('\0')) throw new AppCardError('EXEC_ARGUMENT', 'POSIX arguments cannot contain NUL')
-  return `'${value.replace(/'/gu, '\'\\\'\'')}'`
-}
-
 function programArgv(operation: ExecOperation, input: JsonValue, declaration: CardDeclaration): string[] {
   const program = operation.program
   const args = program.args.map((value, index) => stringValue(value, input, declaration, `Argument ${index}`))
   if (program.kind === 'argv') return [program.executable, ...args]
-  if (!/^(?:sh|bash|dash|ksh|zsh)$/u.test(basename(program.interpreter))) {
-    throw new AppCardError('INTERPRETER_UNSUPPORTED', 'Script programs require a POSIX sh-compatible interpreter; other interpreters must use an explicit argv program')
-  }
-  return [program.interpreter, '-c', program.source, 'app-cards', ...args]
+  try { return scriptArgv(program.interpreter, program.source, args) }
+  catch (error) { throw new AppCardError('INTERPRETER_UNSUPPORTED', errorMessage(error)) }
 }
 
 /** A shared leaf semaphore prevents nested flows from multiplying the Host concurrency limit. */
@@ -173,18 +167,40 @@ async function executeProcess(
       encoding: operation.stdin.encoding,
       value: resolveBinding(operation.stdin.value, { input, data: { ...declaration.data } }),
     })
-  const stdin = stdinData === undefined ? undefined : stdinData.encoding === 'text' ? stdinData.value : JSON.stringify(stdinData.value)
+  let stdin = stdinData === undefined ? undefined : stdinData.encoding === 'text' ? stdinData.value : JSON.stringify(stdinData.value)
   let cwd = context.cwd
   let spawnEnv: Record<string, string> | undefined = environment
+  let completionMarker: string | undefined
   if (context.kind === 'ssh') {
     const [command, flag, config, alias, ...extra] = context.argvPrefix
     if (command !== 'ssh' || flag !== '-F' || !config || !alias || extra.length !== 0) {
       throw new AppCardError('SSH_CONTEXT_INVALID', 'SSH execution requires the exact reviewed ssh -F config alias prefix')
     }
-    const remoteEnv = Object.entries(environment).map(([key, value]) => quotePosix(`${key}=${value}`))
-    const remote = `cd ${quotePosix(context.cwd)} && exec env ${remoteEnv.join(' ')} ${argv.map(quotePosix).join(' ')}`
     const ssh = await env.subprocess.resolveExecutable(command, undefined, clock.signal)
-    argv = [ssh, flag, config, alias, remote]
+    // Only these read-only discovery commands may fall back. The reviewed operation runs once.
+    await env.beforeStep?.()
+    const {runtime} = await detectRemote(async (probe: string) => {
+      clock.signal.throwIfAborted()
+      const handle = env.subprocess.spawn({
+        argv: [ssh, flag, config, alias, probe], cwd: dirname(config),
+        signal: clock.signal, graceMs: env.limits.graceMs,
+        stdio: {stdin:'ignore',stdout:{maxBytes:8192},stderr:{maxBytes:8192}},
+      })
+      let outcome
+      try { outcome = await handle.done }
+      finally {handle.terminate();await handle.waitForExit()}
+      const stdout=handle.collected.stdout?.readFrom(0),stderr=handle.collected.stderr?.readFrom(0)
+      if(clock.signal.aborted||outcome.signal!==null||outcome.exitCode===255) {
+        throw new AppCardError('SSH_PREFLIGHT_FAILED','SSH discovery failed before the application command started; no operation was executed')
+      }
+      if(!stdout||!stderr||stdout.lossy||stderr.lossy) throw new AppCardError('SSH_PREFLIGHT_FAILED','Remote discovery returned missing or oversized output')
+      if(outcome.exitCode!==0)throw Object.assign(new Error('Remote discovery command failed'),{code:outcome.exitCode,stderr:stderr.text})
+      return {stdout:stdout.text}
+    })
+    const remote = remoteInvocation(runtime, {cwd:context.cwd,argv,env:environment,stdin})
+    stdin = remote.stdin
+    completionMarker = remote.completionMarker
+    argv = [ssh, flag, config, alias, remote.command]
     cwd = dirname(config)
     spawnEnv = undefined
   } else {
@@ -201,7 +217,7 @@ async function executeProcess(
     argv, cwd, env: spawnEnv, signal: clock.signal, graceMs: env.limits.graceMs,
     stdio: {
       stdin: stdin === undefined ? 'ignore' : { data: stdin },
-      stdout: { maxBytes }, stderr: { maxBytes },
+      stdout: { maxBytes:maxBytes+(completionMarker?completionMarker.length+16:0) }, stderr: { maxBytes },
     },
   })
   let outcome
@@ -216,13 +232,16 @@ async function executeProcess(
   if (stdout === undefined || stderr === undefined) throw new AppCardError('SUBPROCESS_PROTOCOL', 'Subprocess provider omitted collected output')
   const timedOut = clock.timedOut()
   const aborted = env.signal.aborted && !(env.signal.reason instanceof AppCardError && env.signal.reason.code === 'OPERATION_TIMEOUT')
-  const truncated = stdout.lossy || stderr.lossy
+  const completion = completionMarker && !stdout.lossy ? remoteCompletion(completionMarker,stdout.text) : undefined
+  const payload=completion?.stdout ?? stdout.text
+  const truncated = stdout.lossy || stderr.lossy || Buffer.byteLength(payload)>maxBytes
+  const text = bytePrefix(payload, maxBytes)
+  const exitCode=completionMarker ? completion?.exitCode ?? null : outcome.exitCode
   const process = {
-    exitCode: outcome.exitCode, signal: outcome.signal, timedOut, aborted, truncated,
+    exitCode, signal: outcome.signal, timedOut, aborted, truncated,
     stderr: bytePrefix(stderr.text, maxBytes),
   }
-  const text = bytePrefix(stdout.text, maxBytes)
-  if (context.kind === 'ssh' && (clock.signal.aborted || outcome.exitCode === 255 || outcome.signal !== null)) {
+  if (context.kind === 'ssh' && (clock.signal.aborted || outcome.exitCode === 255 || outcome.signal !== null || completionMarker && !completion)) {
     return {
       state: 'indeterminate', value: text, process,
       error: { code: 'REMOTE_UNCERTAIN', message: 'SSH ended without proving remote completion; remote processes may still be running. No retry was attempted.' },
@@ -238,8 +257,8 @@ async function executeProcess(
   if (truncated) {
     return { ...failure(new AppCardError('OUTPUT_TRUNCATED', 'Process output exceeded outputLimitBytes; incomplete JSON is not decoded')), value: text, process }
   }
-  if (outcome.exitCode === null || !operation.successExitCodes.includes(outcome.exitCode)) {
-    return { ...failure(new AppCardError('EXIT_CODE', `Process exited with ${outcome.exitCode ?? outcome.signal}`)), value: text, process }
+  if (exitCode === null || !operation.successExitCodes.includes(exitCode)) {
+    return { ...failure(new AppCardError('EXIT_CODE', `Process exited with ${exitCode ?? outcome.signal}`)), value: text, process }
   }
   try {
     const value = json.parse(operation.output.decode === 'text' ? text : JSON.parse(text))

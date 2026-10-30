@@ -29,7 +29,7 @@ export default class MachineManagement extends TypertRemoteService {
       output:{schema:{type:'string'},render:(_a,v)=>[{type:'text',text:v}]},timeoutMs:45000,
       isConcurrencySafe:args=>method==='list'||(method==='inspect'&&!args.refresh),
       execute:async args=>JSON.stringify(await this[method](args)),
-      presentCall:args=>({card:'generic',title:method==='list'?'机器目录':method==='inspect'?'读取机器档案':'更新机器档案',kind:method==='manage'?'edit':'read',content:[{type:'text',text:args.machine_id??args.query??''}]})
+      presentCall:args=>({card:'generic',title:method==='list'?'计算机目录':method==='inspect'?'读取计算机档案':'更新计算机档案',kind:method==='manage'?'edit':'read',content:[{type:'text',text:args.machine_id??args.query??''}]})
     }));
   }
   async list(args={}) {return this.store.list(listInput.parse(args));}
