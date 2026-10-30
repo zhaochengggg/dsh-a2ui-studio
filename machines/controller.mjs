@@ -29,13 +29,13 @@ export class DirectoryController {
 }
 export function machineStatus(data){
   const observations=data?.connections?.map(c=>c.observation).filter(Boolean)??[];
-  if(observations.some(o=>o.status==='unreachable'))return 'attention';
+  if(observations.some(o=>o.status==='unreachable'||o.status==='execution_failed'))return 'attention';
   if(observations.some(o=>o.status==='reachable')||data?.virtualMachine?.reachability==='reachable')return 'reachable';
   return 'unknown';
 }
 export function connectionStatus(observation){return !observation?'unknown':observation.status==='reachable'?'reachable':'attention';}
 export function probeTooltip(observation,pending=false){
-  const label=!observation?'尚未检测':observation.status==='reachable'?'连接成功':'连接失败';
+  const label=!observation?'尚未检测':observation.status==='reachable'?'连接成功':observation.status==='execution_failed'?'SSH 已连接，执行检查失败':'连接失败';
   return [pending?'正在检测':label,pending?`上次结果：${label}`:'',observation?.message,
     observation?.observedAt?`检测时间：${new Date(observation.observedAt).toLocaleString()}`:'',
     observation?.lastSuccessAt?`上次成功：${new Date(observation.lastSuccessAt).toLocaleString()}`:''].filter(Boolean).join('\n');

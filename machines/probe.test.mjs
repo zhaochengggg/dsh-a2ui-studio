@@ -40,6 +40,22 @@ test('attempt timeouts obey remaining overall budget',async()=>{
   let count=0;await assert.rejects(connect(c,'a','/tmp/p',{type:'ssh-rsa'},{deadline:Date.now()+200,attemptMs:150,run:async(_,args,opts)=>{count++;assert.ok(opts.timeout<=200);assert.ok(args.includes('HostKeyAlgorithms=rsa-sha2-512,rsa-sha2-256'));await new Promise(r=>setTimeout(r,120));throw {killed:true};}}));assert.equal(count,1);
 });
 test('malformed scanned key ignored',()=>assert.deepEqual(parseKeys('h ssh-ed25519 AAAA'),[]));
+
+test('transport failure retains the classified explanation, not the raw SSH command',async()=>{
+ await assert.rejects(connect(c,'a','/tmp/p',{type:'ssh-ed25519'},{run:async()=>{throw Object.assign(new Error('Command failed: ssh -i private-path a'),{killed:true});}}),e=>classify(e).code==='network_failed'&&/连接失败/.test(classify(e).message)&&!classify(e).message.includes('Command failed:'));
+});
+
+test('PowerShell-only target uses encoded probe and retains strict identity options',async()=>{
+ const calls=[];const result=await connect(c,'a','/tmp/p',{type:'ssh-ed25519'},{run:async(_,args)=>{
+  calls.push(args);if(calls.length===1)throw Object.assign(new Error('printf not found'),{code:1});
+  assert.match(args.at(-1),/^powershell.exe .* -EncodedCommand /);return {stdout:'DSH_MACHINE_OK\r\nwindows-test\r\n'};
+ }});assert.equal(result.runtime,'powershell');assert.equal(result.hostname,'windows-test');assert.equal(calls.length,2);
+});
+test('successful authentication with unusable shell is execution_failed, not unreachable',async()=>{
+ await assert.rejects(connect(c,'a','/tmp/p',{type:'ssh-ed25519'},{run:async()=>({stdout:'unexpected'})}),e=>e.probeCode==='execution_failed');
+ assert.equal(connectionStatus({status:'execution_failed'}),'attention');
+ assert.match(probeTooltip({status:'execution_failed'}),/SSH 已连接，执行检查失败/);
+});
 test('all failures map red; null gray; tooltip contains details only',()=>{
   assert.equal(connectionStatus(null),'unknown');for(const code of ['auth_failed','identity_conflict','network_failed','identity_missing'])assert.equal(connectionStatus({status:'unreachable',code}),'attention');assert.match(probeTooltip({status:'unreachable',message:'登录被拒绝'},true),/正在检测.*\n上次结果：连接失败\n登录被拒绝/);
 });

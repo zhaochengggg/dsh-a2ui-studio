@@ -129,7 +129,7 @@ export class MachineStore {
       if(other.machine.id===m.id || other.machine.archived) continue;
       for(const c of m.connections) if(other.machine.connections.some(d=>c.host.toLowerCase()===d.host.toLowerCase() && c.port===d.port && c.user===d.user && c.identityFile===d.identityFile)) fail(`Connection already registered to ${other.machine.id}`);
     }
-    const defaultMessage = {create:'登记机器。',archive:'移出纳管；保留档案。',restore:'恢复纳管。',update:'更新机器资料。'}[action];
+    const defaultMessage = {create:'登记计算机。',archive:'移出纳管；保留档案。',restore:'恢复纳管。',update:'更新计算机资料。'}[action];
     const message=text(args.message ?? defaultMessage, 4000).trim();
     if(message) history += `${history.endsWith('\n') || !history ? '' : '\n'}## ${stamp()}\n\n${message}\n\n`;
     const files={'machine.json':JSON.stringify(m,null,2)+'\n','notes.md':notes,'history.md':history};
@@ -198,7 +198,7 @@ export class MachineStore {
       const kh=path.join(temp,'known_hosts');await fs.writeFile(kh,`${alias} ${pin.type} ${pin.key}\n`,{mode:0o600});
       const value=await connect(c,alias,kh,pin,{deadline});
       return {status:'reachable',code:'ok',observedAt:stamp(),durationMs:Date.now()-start,...value};
-    }catch(e){return {status:'unreachable',...classify(e),observedAt:stamp(),durationMs:Date.now()-start,attempts:e.attempts,evidence:e.evidence};}
+    }catch(e){const failure=classify(e);return {status:failure.code==='execution_failed'?'execution_failed':'unreachable',...failure,observedAt:stamp(),durationMs:Date.now()-start,attempts:e.attempts,evidence:e.evidence};}
     finally{if(temp)await fs.rm(temp,{recursive:true,force:true});}
   }
 }

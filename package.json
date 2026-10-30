@@ -23,6 +23,7 @@
     "machines/index.mjs",
     "machines/store.mjs",
     "machines/probe.mjs",
+    "shared/remote-execution.mjs",
     "machines/ssh-paths.mjs",
     "machines/remote.mjs",
     "machines/observations.mjs",

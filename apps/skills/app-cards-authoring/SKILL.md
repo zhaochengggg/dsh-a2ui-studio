@@ -37,6 +37,10 @@ user-invocable: true
 
 可执行程序与源码固定，输入结构化绑定到 argv 或 stdin，不拼接 shell 源码。敏感信息只引用安全存储，不写进卡片数据、工具结果和 UI。effect: observe 是作者承诺，不是沙箱，需核实探针只读。SSH 身份由机器插件提供，不复制密码/私钥或另建主机目录。
 
+SSH 目标由执行层按需只读识别 Windows/POSIX，不需要新增登记字段。Windows 脚本使用 program.kind: script、interpreter: powershell.exe（或已安装的 pwsh.exe）；参数仍放 args，目录使用 Windows 原生路径，输出 JSON 时显式使用 UTF-8。不改目标全局默认 shell，不用 Git Bash 包装 PowerShell。连接探测成功后仍须实际验证卡片操作；不可把宿主 Windows 测试当成 Windows 目标测试。
+
+Windows argv 支持原生可执行程序；cmd.exe、.cmd/.bat 不具备逐参数原样传递语义，执行层明确拒绝，改用 PowerShell script。Windows 参数通过启动器的标准输入头传递，应用 stdin 独立保留，不将大段脚本嵌入 SSH 命令行。原生程序自身的 Windows 命令行长度限制仍适用。
+
 默认打开面板检查一次。持续查看可声明 monitoring: {intervalMs: 15000}（至少 5000 ms），仅面板打开且页面可见时生效，周期检查禁止调用 agent。动作结束后会对 invalidates 中的检查做一次只读核验，不重试动作。耗时启动使用合理刷新周期或有界 readiness 检查，不把早期未就绪当作启动命令失败。
 
 仅纳管服务生命周期时读 [生命周期](references/service-lifecycle.md)；实际为 systemd 再读 [systemd](references/systemd-example.md) 和 [完整声明](references/service-card.md)。示例不是所有应用的模板。

@@ -1,5 +1,6 @@
 /* One owner for the machine panel. Host colors; fixed alignment, no distributed endpoint labels. */
-.mm-overlay{position:fixed;inset:0;z-index:80;display:flex;justify-content:flex-end;pointer-events:none;color:var(--dsw-alias-label-primary,#24262b);font-family:inherit;font-size:13px;line-height:1.6}
+/* Official shell clearance + Electron enhanced-mode native controls; web/fullscreen use zero. */
+.mm-overlay{position:fixed;inset:max(var(--dsh-frame-chrome-top,0px),env(titlebar-area-height,0px)) 0 0;z-index:80;display:flex;justify-content:flex-end;pointer-events:none;color:var(--dsw-alias-label-primary,#24262b);font-family:inherit;font-size:13px;line-height:1.6}
 .mm-panel{position:relative;pointer-events:auto;max-width:100vw;height:100%;background:var(--dsw-alias-bg-base,#fff);border-left:1px solid var(--mm-line);box-shadow:-8px 0 32px #0001;display:flex;flex-direction:column;outline:none;--mm-line:var(--mg-line);--mm-soft:var(--mg-hover);--mm-muted:var(--mg-muted)}
 .mm-panel *{box-sizing:border-box}
 .mm-panel :is(h2,h3,p):where(:not([data-machine-detail-card] *)){margin:0}

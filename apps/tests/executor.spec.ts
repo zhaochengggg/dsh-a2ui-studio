@@ -211,14 +211,47 @@ describe('application operation execution', () => {
     const { env, cwd, declaration } = await setup()
     const original = env.subprocess.spawn.bind(env.subprocess)
     vi.spyOn(env.subprocess, 'resolveExecutable').mockResolvedValue('/resolved/ssh')
+    let calls=0
     const spawn = vi.spyOn(env.subprocess, 'spawn').mockImplementation(spec => original({
-      ...spec, cwd, argv: [process.execPath, '-e', 'process.exitCode=255'],
+      ...spec, cwd, argv: [process.execPath, '-e', ++calls===1?'console.log("DSH_MACHINE_OK\\nhost")':'process.exitCode=255'],
     }))
     const result = await executeOperation(declaration({ run: node('console.log(1)') }), 'run', {}, {
       ...env, contexts: { local: { kind: 'ssh', cwd: '/tmp', argvPrefix: ['ssh', '-F', '/tmp/config', 'alias'], identity: 'test', display: 'ssh' } },
     })
     expect(result).toMatchObject({ state: 'indeterminate', process: { exitCode: 255 }, error: { code: 'REMOTE_UNCERTAIN' } })
+    expect(spawn).toHaveBeenCalledTimes(2) // one read-only discovery, one operation; never retry it
+  })
+
+  it('fails before executing the operation when SSH discovery fails',async()=>{
+    const {env,cwd,declaration}=await setup()
+    const original=env.subprocess.spawn.bind(env.subprocess)
+    vi.spyOn(env.subprocess,'resolveExecutable').mockResolvedValue('/resolved/ssh')
+    const spawn=vi.spyOn(env.subprocess,'spawn').mockImplementation(spec=>original({...spec,cwd,argv:[process.execPath,'-e','process.exitCode=255']}))
+    expect(await executeOperation(declaration({run:node('console.log(1)')}),'run',{}, {
+      ...env,contexts:{local:{kind:'ssh',cwd:'/tmp',argvPrefix:['ssh','-F','/tmp/config','alias'],identity:'test',display:'ssh'}},
+    })).toMatchObject({state:'failed',error:{code:'SSH_PREFLIGHT_FAILED'}})
     expect(spawn).toHaveBeenCalledTimes(1)
+  })
+
+  it('reserves Windows completion framing outside the application output limit',async()=>{
+    const {env,cwd,declaration}=await setup()
+    const original=env.subprocess.spawn.bind(env.subprocess)
+    vi.spyOn(env.subprocess,'resolveExecutable').mockResolvedValue('/resolved/ssh')
+    let count=0,length=255
+    vi.spyOn(env.subprocess,'spawn').mockImplementation(spec=>{
+      count++
+      let source=count%3===1?'process.exitCode=127':count%3===2?'console.log("DSH_MACHINE_OK\\nhost")':
+       `let s="";process.stdin.on("data",v=>s+=v);process.stdin.on("end",()=>{const h=JSON.parse(Buffer.from(s.split("\\n")[0],"base64").toString());process.stdout.write("x".repeat(${length})+"\\n"+h.marker+"0\\n")})`
+      return original({...spec,cwd,argv:[process.execPath,'-e',source]})
+    })
+    const operation={...node(''),outputLimitBytes:256,output:{decode:'text' as const,schema:{type:'string' as const}}}
+    const remote={...env,contexts:{local:{kind:'ssh' as const,cwd:'C:\\test',argvPrefix:['ssh','-F','/tmp/config','alias'],identity:'test',display:'ssh'}}}
+    for(length of [255,256,257,1024]){
+      const r=await executeOperation(declaration({run:operation}),'run',{},remote)
+      if(length<=256)expect(r).toMatchObject({state:'succeeded',value:'x'.repeat(length)})
+      else if(length===257)expect(r).toMatchObject({state:'failed',error:{code:'OUTPUT_TRUNCATED'}})
+      else expect(r).toMatchObject({state:'indeterminate',process:{exitCode:null,truncated:true},error:{code:'REMOTE_UNCERTAIN'}})
+    }
   })
 
   it('executes pure transforms and schema-validates explicit agent results', async () => {

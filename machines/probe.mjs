@@ -5,6 +5,7 @@ import {promisify} from 'node:util';
 import {sshNullFile,sshOptionPath} from './ssh-paths.mjs';
 import {access} from 'node:fs/promises';
 import {join} from 'node:path';
+import {detectRemote} from '../shared/remote-execution.mjs';
 const exec=promisify(execFile);
 export async function execute(file,args,options) {
   const settings={...options,windowsHide:true};
@@ -39,9 +40,9 @@ export function problem(code,message){return Object.assign(new Error(message),{p
 export function classify(error) {
   if(error.probeCode)return {code:error.probeCode,message:error.message};
   const detail=String(error.stderr||(error.killed?'探测超时':error.message)||'').replace(/^Command failed:[^\n]*(\n|$)/,'').trim().slice(0,400);
-  if(/REMOTE HOST IDENTIFICATION HAS CHANGED|Offending .* key/i.test(detail))return {code:'identity_conflict',message:'机器身份有变化；已阻断连接。\n'+detail};
-  if(/no matching host key type|no matching key exchange|no matching cipher/i.test(detail))return {code:'algorithm_unavailable',message:'无法用登记的算法验证机器身份。\n'+detail};
-  if(/Host key verification failed|No .* host key is known/i.test(detail))return {code:'identity_unverified',message:'机器身份核验未通过；已阻断连接。\n'+detail};
+  if(/REMOTE HOST IDENTIFICATION HAS CHANGED|Offending .* key/i.test(detail))return {code:'identity_conflict',message:'计算机身份有变化；已阻断连接。\n'+detail};
+  if(/no matching host key type|no matching key exchange|no matching cipher/i.test(detail))return {code:'algorithm_unavailable',message:'无法用登记的算法验证计算机身份。\n'+detail};
+  if(/Host key verification failed|No .* host key is known/i.test(detail))return {code:'identity_unverified',message:'计算机身份核验未通过；已阻断连接。\n'+detail};
   if(/Permission denied|Authentication failed|Too many authentication/i.test(detail))return {code:'auth_failed',message:'登录被拒绝；请检查账号和登录密钥。\n'+detail};
   if(error.killed||/timed out|timeout|Connection reset|Connection closed|Connection refused|No route to host|Network is unreachable|Connection timed/i.test(detail))return {code:'network_failed',message:'连接失败（超时或网络错误）。\n'+detail};
   return {code:'probe_error',message:'探测未完成。\n'+detail};
@@ -77,11 +78,14 @@ export async function connect(c,alias,knownHosts,key,{run=execute,deadline=Date.
     const budget=Math.min(attemptMs,remaining);
     const options={HostName:c.host,Port:c.port,User:c.user,HostKeyAlias:alias,UserKnownHostsFile:sshOptionPath(knownHosts),GlobalKnownHostsFile:sshNullFile(),StrictHostKeyChecking:'yes',UpdateHostKeys:'no',BatchMode:'yes',ControlMaster:'no',ControlPath:'none',ForwardAgent:'no',ForwardX11:'no',ClearAllForwardings:'yes',PermitLocalCommand:'no',ProxyCommand:'none',ProxyJump:'none',PasswordAuthentication:'no',KbdInteractiveAuthentication:'no',ConnectionAttempts:1,ConnectTimeout:Math.max(1,Math.ceil(budget/1000)),HostKeyAlgorithms:hostAlgorithms(key.type)};
     if(c.identityFile){options.IdentityFile=sshOptionPath(c.identityFile);options.IdentitiesOnly='yes';}
-    const args=['-F',sshNullFile(),...Object.entries(options).flatMap(([k,v])=>['-o',`${k}=${v}`]),alias,'echo DSH_MACHINE_OK && hostname'];
-    try{const r=await run('ssh',args,{timeout:budget,maxBuffer:8192,env:{...process.env,LC_ALL:'C'}});
-      const stdout=r.stdout.replaceAll('\r\n','\n');
-      if(!stdout.startsWith('DSH_MACHINE_OK\n'))throw problem('probe_error','SSH 已响应，但探测命令返回格式异常。');
-      return {hostname:stdout.split('\n')[1],attempts:attempt};
+    const args=['-F',sshNullFile(),...Object.entries(options).flatMap(([k,v])=>['-o',`${k}=${v}`]),alias];
+    try{const value=await detectRemote(async command=>{
+      const left=Math.min(budget,deadline-Date.now());
+      if(left<100)throw problem('network_failed','连接探测已达到总时间上限。');
+      try{return await run('ssh',[...args,command],{timeout:left,maxBuffer:8192,env:{...process.env,LC_ALL:'C'}});}
+      catch(e){const classified=classify(e);if(classified.code!=='probe_error'){e.probeCode=classified.code;e.message=classified.message;}throw e;}
+    });
+      return {...value,attempts:attempt};
     }catch(e){if(attempt===2||classify(e).code!=='network_failed'||deadline-Date.now()<100){e.attempts=attempt;throw e;}}
   }
 }

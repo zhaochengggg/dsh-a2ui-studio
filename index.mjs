@@ -21,5 +21,5 @@ export async function apply(ctx,config={}) {
   ctx.plugin(AppCardsService,paths.apps);
   const url=new URL('./skills/machine-management/SKILL.md',import.meta.url);
   const content=await readFile(url,'utf8');
-  ctx.skills.register({name:'machine-management',description:'登记、连接和维护机器目录；定位应用所属机器。',content:content.replace(/^---[\s\S]*?---\s*/,''),source:'bundled',provider:'dsh-control-studio',path:fileURLToPath(url),resourceBase:{kind:'directory',path:fileURLToPath(new URL('./skills/machine-management/',import.meta.url))},invocation:{modelInvocable:true,userInvocable:true}});
+  ctx.skills.register({name:'machine-management',description:'登记、连接和维护计算机目录；定位应用所属计算机。',content:content.replace(/^---[\s\S]*?---\s*/,''),source:'bundled',provider:'dsh-control-studio',path:fileURLToPath(url),resourceBase:{kind:'directory',path:fileURLToPath(new URL('./skills/machine-management/',import.meta.url))},invocation:{modelInvocable:true,userInvocable:true}});
 }
